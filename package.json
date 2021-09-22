@@ -1,0 +1,24 @@
+{
+  "name": "zad1_tablica_panstw_TS",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafdul/zad1_tablica_panstw_TS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rafdul/zad1_tablica_panstw_TS/issues"
+  },
+  "homepage": "https://github.com/rafdul/zad1_tablica_panstw_TS#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.12",
+    "typescript": "^4.4.2"
+  }
+}
