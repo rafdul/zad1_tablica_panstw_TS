@@ -17,8 +17,9 @@
 window.onload = function() {
     console.log('App started!');
 
-    tableWithStates.init();
+    // tableWithStates.init();
 }
+
 
 // interfejsy zmiennych
 interface Texts {
@@ -95,7 +96,8 @@ class TableWithStates {
             storage.saveStorage('states', responseJson);
         }
         catch(err) {
-            console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.b, ' | ',err)
+            throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b)
+            // console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.b, ' | ',err)
         }
     }
 
@@ -116,7 +118,7 @@ class TableWithStates {
     }
 
     // porównanie populacji z dwóch zbiorów danych
-    comparePopulationBetweenData(stateDataOld:any, stateDataNew:any) {
+    comparePopulationBetweenData(stateDataOld: any, stateDataNew:any) {
         // console.log('typ stateDataOld:', typeof stateDataOld, '| ', stateDataOld); //typ object
         // console.log('typ stateDataNew:', typeof stateDataNew, '| ', stateDataNew);
 
@@ -130,7 +132,9 @@ class TableWithStates {
     }
 
     // pętla po starym zestawie danych
-    infoAboutChangingPopulation(oldData: {}[], newData: {}[]) {
+    infoAboutChangingPopulation(oldData: [], newData: []): void {
+        console.log('oldData:', Array.isArray(oldData) ,typeof oldData,oldData);
+        console.log('newData:',Array.isArray(newData), typeof newData, newData);
         for(let i = 0; i < oldData.length; i++) {
             newData.find(el => this.comparePopulationBetweenData(el, oldData[i]));
         }
@@ -140,7 +144,15 @@ class TableWithStates {
     }
 }
 
-const tableWithStates = new TableWithStates();
+
+
+
+let tableWithStates = new TableWithStates();
+console.log('tableWithStates:', tableWithStates)
+tableWithStates.init();
+
+
+
 
 // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
 class StorageBrowser {
@@ -166,3 +178,4 @@ class StorageBrowser {
 }
 
 const storage = new StorageBrowser();
+

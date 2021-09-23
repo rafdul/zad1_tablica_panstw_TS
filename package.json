@@ -19,6 +19,7 @@
   "homepage": "https://github.com/rafdul/zad1_tablica_panstw_TS#readme",
   "devDependencies": {
     "nodemon": "^2.0.12",
+    "parcel-bundler": "^1.12.5",
     "typescript": "^4.4.2"
   }
 }
