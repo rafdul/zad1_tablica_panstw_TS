@@ -109,27 +109,38 @@ class TableWithStates {
             .then(response => response.json())
             .then(data => {
                 console.log('Dane państw pobrane z API:', data);
+
                 if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
                     this.infoAboutChangingPopulation(storage.getStorage('states'), data);
                 }
+
                 let time: Date = new Date();
                 this.dateDownloadFromApi = time.getTime();
-                console.log('this.dateDownloadFromApi typ:', typeof this.dateDownloadFromApi, this.dateDownloadFromApi)
+                // console.log('this.dateDownloadFromApi typ:', typeof this.dateDownloadFromApi, this.dateDownloadFromApi)
                 storage.saveStorage('date', this.dateDownloadFromApi);
+                
                 storage.saveStorage('states', data);
-            });
+            })
+            .catch(err => {
+                throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b)
+            })
 
     }
 
 
 
     // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
-    downloadFromApiAgain(timeDownloadFromApi: string): boolean {
-        console.log('start sprawdź datę w localstorage')
+    downloadFromApiAgain(timeDownloadFromApi: number[]): boolean {
+        console.log('start sprawdź datę w localstorage');
+        console.log('timeDownloadFromApi', timeDownloadFromApi, ' to jet typ ', typeof timeDownloadFromApi)
+
         const MS_IN_6DAYS: number = 6*24*60*60*1000;
         const MS_FOR_TEST: number = 30*1000;
         const timeNow: number = (new Date).getTime();
-        const differenceInMs: number = timeNow - parseFloat(timeDownloadFromApi);
+        let differenceInMs: number = 0
+        if(timeDownloadFromApi.length === 1) {
+            differenceInMs = timeNow - timeDownloadFromApi[0];
+        }
         console.log('differenceInMs', typeof differenceInMs, differenceInMs)
 
         if(differenceInMs <= MS_FOR_TEST) {
@@ -157,8 +168,8 @@ class TableWithStates {
 
     // pętla po starym zestawie danych
     infoAboutChangingPopulation(oldData: [], newData: []): void {
-        console.log('oldData:', Array.isArray(oldData) ,typeof oldData,oldData);
-        console.log('newData:',Array.isArray(newData), typeof newData, newData);
+        // console.log('oldData:', Array.isArray(oldData) ,typeof oldData,oldData);
+        // console.log('newData:',Array.isArray(newData), typeof newData, newData);
         for(let i = 0; i < oldData.length; i++) {
             newData.find(el => this.comparePopulationBetweenData(el, oldData[i]));
         }
@@ -178,25 +189,39 @@ let tableWithStates = new TableWithStates();
 // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
 class StorageBrowser {
     getStorage(key: string): any {
-        let content: any = null;
-        console.log('content w getStorage', 'klucz ', key, typeof content, ' zawartość: ', content);
+        let content: number[] | [] = [];
+        let contentInLocalStorage: string|null = localStorage.getItem(key);
 
-        if(localStorage.getItem(key) !== null || localStorage.getItem(key) !== undefined) {
-            if(localStorage.getItem(key) == 'number') {
-                content = localStorage.getItem(key);
+        if(contentInLocalStorage !== null) {
+            let fromJSON: any = JSON.parse(contentInLocalStorage);
+            if (typeof fromJSON === 'number') {
+                let newTab: number[] = [];
+                newTab.push(fromJSON);
+                content = newTab;
             } else {
-                content = JSON.parse( localStorage.getItem(key) );
+                content = fromJSON;
             }
+
+            // console.log(key, 'localStorage.getItem(key)', typeof localStorage.getItem(key));
+            // console.log(key, 'content typ',typeof content);
+            // console.log('content w getStorage', 'klucz ', key, typeof content);
+            
         } else {
+            console.log('localstorage jest pusty dla klucza:', key)
             content = [];
         }
+        console.log(key, 'content', typeof content, 'czy tablica: ', Array.isArray(content));
         return content;
     }
 
-    saveStorage(key: string, item: any ) {
+    saveStorage(key: string, item: any ): void {
         console.log('item w saveStorage', typeof item, 'klucz', key, ' zawartość: ', item);
-        if(item === null || item === undefined) return console.log(textsForConsoleLog.storage.saveStorage.a);
-        if(typeof item == 'number') localStorage.setItem(key, `${item}`);
+        if(item === null || item === undefined) {
+            return console.log(textsForConsoleLog.storage.saveStorage.a)
+        };
+        if(typeof item == 'number') {
+            localStorage.setItem(key, `${item}`)
+        };
         localStorage.setItem(key, JSON.stringify(item));
     }
 }

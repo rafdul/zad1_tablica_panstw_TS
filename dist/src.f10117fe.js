@@ -222,20 +222,28 @@ var TableWithStates = function () {
       }
 
       var time = new Date();
-      _this.dateDownloadFromApi = time.getTime();
-      console.log('this.dateDownloadFromApi typ:', _typeof(_this.dateDownloadFromApi), _this.dateDownloadFromApi);
+      _this.dateDownloadFromApi = time.getTime(); // console.log('this.dateDownloadFromApi typ:', typeof this.dateDownloadFromApi, this.dateDownloadFromApi)
+
       storage.saveStorage('date', _this.dateDownloadFromApi);
       storage.saveStorage('states', data);
+    }).catch(function (err) {
+      throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b);
     });
   }; // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
 
 
   TableWithStates.prototype.downloadFromApiAgain = function (timeDownloadFromApi) {
     console.log('start sprawdź datę w localstorage');
+    console.log('timeDownloadFromApi', timeDownloadFromApi, ' to jet typ ', _typeof(timeDownloadFromApi));
     var MS_IN_6DAYS = 6 * 24 * 60 * 60 * 1000;
     var MS_FOR_TEST = 30 * 1000;
     var timeNow = new Date().getTime();
-    var differenceInMs = timeNow - parseFloat(timeDownloadFromApi);
+    var differenceInMs = 0;
+
+    if (timeDownloadFromApi.length === 1) {
+      differenceInMs = timeNow - timeDownloadFromApi[0];
+    }
+
     console.log('differenceInMs', _typeof(differenceInMs), differenceInMs);
 
     if (differenceInMs <= MS_FOR_TEST) {
@@ -264,14 +272,13 @@ var TableWithStates = function () {
   TableWithStates.prototype.infoAboutChangingPopulation = function (oldData, newData) {
     var _this = this;
 
-    console.log('oldData:', Array.isArray(oldData), _typeof(oldData), oldData);
-    console.log('newData:', Array.isArray(newData), _typeof(newData), newData);
-
     var _loop_1 = function _loop_1(i) {
       newData.find(function (el) {
         return _this.comparePopulationBetweenData(el, oldData[i]);
       });
-    };
+    }; // console.log('oldData:', Array.isArray(oldData) ,typeof oldData,oldData);
+    // console.log('newData:',Array.isArray(newData), typeof newData, newData);
+
 
     for (var i = 0; i < oldData.length; i++) {
       _loop_1(i);
@@ -289,26 +296,45 @@ var StorageBrowser = function () {
   function StorageBrowser() {}
 
   StorageBrowser.prototype.getStorage = function (key) {
-    var content = null;
-    console.log('content w getStorage', 'klucz ', key, _typeof(content), ' zawartość: ', content);
+    var content = [];
+    var contentInLocalStorage = localStorage.getItem(key);
 
-    if (localStorage.getItem(key) !== null || localStorage.getItem(key) !== undefined) {
-      if (localStorage.getItem(key) == 'number') {
-        content = localStorage.getItem(key);
+    if (contentInLocalStorage !== null) {
+      var fromJSON = JSON.parse(contentInLocalStorage);
+
+      if (typeof fromJSON === 'number') {
+        var newTab = [];
+        newTab.push(fromJSON);
+        content = newTab;
       } else {
-        content = JSON.parse(localStorage.getItem(key));
-      }
+        content = fromJSON;
+      } // console.log(key, 'localStorage.getItem(key)', typeof localStorage.getItem(key));
+      // console.log(key, 'content typ',typeof content);
+      // console.log('content w getStorage', 'klucz ', key, typeof content);
+
     } else {
+      console.log('localstorage jest pusty dla klucza:', key);
       content = [];
     }
 
+    console.log(key, 'content', _typeof(content), 'czy tablica: ', Array.isArray(content));
     return content;
   };
 
   StorageBrowser.prototype.saveStorage = function (key, item) {
     console.log('item w saveStorage', _typeof(item), 'klucz', key, ' zawartość: ', item);
-    if (item === null || item === undefined) return console.log(textsForConsoleLog.storage.saveStorage.a);
-    if (typeof item == 'number') localStorage.setItem(key, "" + item);
+
+    if (item === null || item === undefined) {
+      return console.log(textsForConsoleLog.storage.saveStorage.a);
+    }
+
+    ;
+
+    if (typeof item == 'number') {
+      localStorage.setItem(key, "" + item);
+    }
+
+    ;
     localStorage.setItem(key, JSON.stringify(item));
   };
 
