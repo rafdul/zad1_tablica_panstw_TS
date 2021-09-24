@@ -135,8 +135,6 @@ parcelRequire = (function (modules, cache, entry, globalName) {
  * Kod może posiadać komentarze.
 **/
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 window.onload = function () {
   console.log('App started!');
   tableWithStates.init();
@@ -158,6 +156,9 @@ var textsForConsoleLog = {
     downloadFromApiAgain: {
       a: 'Korzystam z localstorage i nie pobieram nowych danych z API. Od ostatniego pobrania z API upłynęło mniej niż ',
       b: 'Od ostatniego pobrania z API upłynęło więcej niż 6 dni, więc ponownie pobieram dane z API.'
+    },
+    countTimeFromLastApi: {
+      a: 'Od ostatniego pobrania z API minęło: '
     },
     infoAboutChangingPopulation: {
       a: 'Od ostatniego pobrania z API zmieniła się liczba ludności w krajach: ',
@@ -215,15 +216,14 @@ var TableWithStates = function () {
     fetch(this.url).then(function (response) {
       return response.json();
     }).then(function (data) {
-      console.log('Dane państw pobrane z API:', data);
+      console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, data);
 
       if (storage.getStorage('states') && storage.getStorage('states').length > 0) {
         _this.infoAboutChangingPopulation(storage.getStorage('states'), data);
       }
 
       var time = new Date();
-      _this.dateDownloadFromApi = time.getTime(); // console.log('this.dateDownloadFromApi typ:', typeof this.dateDownloadFromApi, this.dateDownloadFromApi)
-
+      _this.dateDownloadFromApi = time.getTime();
       storage.saveStorage('date', _this.dateDownloadFromApi);
       storage.saveStorage('states', data);
     }).catch(function (err) {
@@ -233,8 +233,6 @@ var TableWithStates = function () {
 
 
   TableWithStates.prototype.downloadFromApiAgain = function (timeDownloadFromApi) {
-    console.log('start sprawdź datę w localstorage');
-    console.log('timeDownloadFromApi', timeDownloadFromApi, ' to jet typ ', _typeof(timeDownloadFromApi));
     var MS_IN_6DAYS = 6 * 24 * 60 * 60 * 1000;
     var MS_FOR_TEST = 30 * 1000;
     var timeNow = new Date().getTime();
@@ -242,26 +240,36 @@ var TableWithStates = function () {
 
     if (timeDownloadFromApi.length === 1) {
       differenceInMs = timeNow - timeDownloadFromApi[0];
+      this.countTimeFromLastApi(differenceInMs);
     }
 
-    console.log('differenceInMs', _typeof(differenceInMs), differenceInMs);
-
-    if (differenceInMs <= MS_FOR_TEST) {
-      console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.a, MS_FOR_TEST + 'ms');
+    if (differenceInMs <= MS_IN_6DAYS) {
+      console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.a, MS_IN_6DAYS + 'ms');
       return false;
     } else {
       console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.b);
       return true;
     }
+  }; //  oblicza czas od ostaniego pobrania z API
+
+
+  TableWithStates.prototype.countTimeFromLastApi = function (timeDownload) {
+    var sek = timeDownload / 1000;
+    var min = sek / 60;
+    var hours = min / 60;
+    var days = hours / 24;
+    var leftSek = Math.floor(sek % 60);
+    var leftMin = Math.floor(min % 60);
+    var leftHours = Math.floor(hours % 24);
+    var leftDays = Math.floor(days);
+    var result = leftDays + " dni, " + leftHours + " godzin, " + leftMin + " min, " + leftSek + " sek";
+    console.log(textsForConsoleLog.tableWithStates.countTimeFromLastApi.a, result);
   }; // porównanie populacji z dwóch zbiorów danych
 
 
   TableWithStates.prototype.comparePopulationBetweenData = function (stateDataOld, stateDataNew) {
-    // console.log('typ stateDataOld:', typeof stateDataOld, '| ', stateDataOld); //typ object
-    // console.log('typ stateDataNew:', typeof stateDataNew, '| ', stateDataNew);
     if (stateDataOld.alpha3Code === stateDataNew.alpha3Code) {
       if (stateDataOld.population !== stateDataNew.population) {
-        // console.log('liczba ludności zmieniła się w: ', stateDataOld.name);
         this.tableAfterComparison.push(stateDataOld.name);
         return;
       }
@@ -273,12 +281,12 @@ var TableWithStates = function () {
     var _this = this;
 
     var _loop_1 = function _loop_1(i) {
-      newData.find(function (el) {
-        return _this.comparePopulationBetweenData(el, oldData[i]);
-      });
-    }; // console.log('oldData:', Array.isArray(oldData) ,typeof oldData,oldData);
-    // console.log('newData:',Array.isArray(newData), typeof newData, newData);
-
+      if (newData.length > 0) {
+        newData.filter(function (el) {
+          return _this.comparePopulationBetweenData(el, oldData[i]);
+        });
+      }
+    };
 
     for (var i = 0; i < oldData.length; i++) {
       _loop_1(i);
@@ -308,22 +316,17 @@ var StorageBrowser = function () {
         content = newTab;
       } else {
         content = fromJSON;
-      } // console.log(key, 'localStorage.getItem(key)', typeof localStorage.getItem(key));
-      // console.log(key, 'content typ',typeof content);
-      // console.log('content w getStorage', 'klucz ', key, typeof content);
-
+      }
     } else {
-      console.log('localstorage jest pusty dla klucza:', key);
       content = [];
-    }
+    } // console.log(key, 'content', typeof content, 'czy tablica: ', Array.isArray(content));
 
-    console.log(key, 'content', _typeof(content), 'czy tablica: ', Array.isArray(content));
+
     return content;
   };
 
   StorageBrowser.prototype.saveStorage = function (key, item) {
-    console.log('item w saveStorage', _typeof(item), 'klucz', key, ' zawartość: ', item);
-
+    // console.log('item w saveStorage', typeof item, 'klucz', key, ' zawartość: ', item);
     if (item === null || item === undefined) {
       return console.log(textsForConsoleLog.storage.saveStorage.a);
     }
