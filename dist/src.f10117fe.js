@@ -137,18 +137,9 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 window.onload = function () {
-  console.log('App started!'); // tableWithStates.init();
+  console.log('App started!');
+  tableWithStates.init();
 };
 
 ; // zmienna zawierająca bibliotekę komunikatów w konsoli
@@ -180,162 +171,146 @@ var textsForConsoleLog = {
   }
 };
 
-var TableWithStates = /*#__PURE__*/function () {
+var TableWithStates = function () {
   function TableWithStates() {
-    var _this = this;
-
-    _classCallCheck(this, TableWithStates);
-
     this.url = "https://restcountries.com/v3/all";
     this.dateDownloadFromApi = 0;
-    this.tableAfterComparison = []; // pobranie danych z API; zapisanie w local storage pobranych danych i timestamp pobrania (wersja async / await)
-
-    this.downloadFromAPI = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-      var response, responseJson, time;
-      return regeneratorRuntime.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              _context.prev = 0;
-              _context.next = 3;
-              return fetch(_this.url);
-
-            case 3:
-              response = _context.sent;
-              _context.next = 6;
-              return response.json();
-
-            case 6:
-              responseJson = _context.sent;
-              console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, responseJson);
-
-              if (storage.getStorage('states').length > 0) {
-                _this.infoAboutChangingPopulation(storage.getStorage('states'), responseJson);
-              }
-
-              time = new Date();
-              _this.dateDownloadFromApi = time.getTime();
-              storage.saveStorage('date', _this.dateDownloadFromApi);
-              storage.saveStorage('states', responseJson);
-              _context.next = 18;
-              break;
-
-            case 15:
-              _context.prev = 15;
-              _context.t0 = _context["catch"](0);
-              throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b);
-
-            case 18:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, _callee, null, [[0, 15]]);
-    }));
+    this.tableAfterComparison = [];
   }
 
-  _createClass(TableWithStates, [{
-    key: "init",
-    value: function init() {
-      if (this.downloadFromApiAgain(storage.getStorage('date')) === false && storage.getStorage('states').length > 0) {
-        console.log(textsForConsoleLog.tableWithStates.init.a, storage.getStorage('states').length);
-        console.log(textsForConsoleLog.tableWithStates.init.b, storage.getStorage('states'));
-      } else {
-        console.log(textsForConsoleLog.tableWithStates.init.c);
-        this.downloadFromAPI();
-      }
-    } // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
-
-  }, {
-    key: "downloadFromApiAgain",
-    value: function downloadFromApiAgain(timeDownloadFromApi) {
-      var MS_IN_6DAYS = 6 * 24 * 60 * 60 * 1000;
-      var MS_FOR_TEST = 15 * 1000;
-      var timeNow = new Date().getTime();
-      var differenceInMs = timeNow - timeDownloadFromApi;
-
-      if (differenceInMs <= MS_FOR_TEST) {
-        console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.a, MS_FOR_TEST + 'ms');
-        return false;
-      } else {
-        console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.b);
-        return true;
-      }
-    } // porównanie populacji z dwóch zbiorów danych
-
-  }, {
-    key: "comparePopulationBetweenData",
-    value: function comparePopulationBetweenData(stateDataOld, stateDataNew) {
-      // console.log('typ stateDataOld:', typeof stateDataOld, '| ', stateDataOld); //typ object
-      // console.log('typ stateDataNew:', typeof stateDataNew, '| ', stateDataNew);
-      if (stateDataOld.alpha3Code === stateDataNew.alpha3Code) {
-        if (stateDataOld.population !== stateDataNew.population) {
-          // console.log('liczba ludności zmieniła się w: ', stateDataOld.name);
-          this.tableAfterComparison.push(stateDataOld.name);
-          return;
-        }
-      }
-    } // pętla po starym zestawie danych
-
-  }, {
-    key: "infoAboutChangingPopulation",
-    value: function infoAboutChangingPopulation(oldData, newData) {
-      var _this2 = this;
-
-      console.log('oldData:', Array.isArray(oldData), _typeof(oldData), oldData);
-      console.log('newData:', Array.isArray(newData), _typeof(newData), newData);
-
-      var _loop = function _loop(i) {
-        newData.find(function (el) {
-          return _this2.comparePopulationBetweenData(el, oldData[i]);
-        });
-      };
-
-      for (var i = 0; i < oldData.length; i++) {
-        _loop(i);
-      }
-
-      return this.tableAfterComparison.length > 0 ? console.log(textsForConsoleLog.tableWithStates.infoAboutChangingPopulation.a, this.tableAfterComparison) : console.log(textsForConsoleLog.tableWithStates.infoAboutChangingPopulation.b);
+  TableWithStates.prototype.init = function () {
+    if (this.downloadFromApiAgain(storage.getStorage('date')) === false && storage.getStorage('states').length > 0) {
+      console.log(textsForConsoleLog.tableWithStates.init.a, storage.getStorage('states').length);
+      console.log(textsForConsoleLog.tableWithStates.init.b, storage.getStorage('states'));
+    } else {
+      console.log(textsForConsoleLog.tableWithStates.init.c);
+      this.downloadFromAPI();
     }
-  }]);
+  }; // pobranie danych z API; zapisanie w local storage pobranych danych i timestamp pobrania (wersja async / await)
+  // downloadFromAPI = async() => { 
+  //     try {
+  //         const response = await fetch(this.url);
+  //         console.log('response typ:', typeof response, ' zawartość: ', response);
+  //         const responseJson = await response.json();
+  //         console.log('responseJson typ:', typeof responseJson, ', czy tablica?', Array.isArray(responseJson), ' zawartość: ', responseJson);
+  //         console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, responseJson);
+  //         if(storage.getStorage('states').length > 0) {
+  //             this.infoAboutChangingPopulation(storage.getStorage('states'), responseJson);
+  //         }
+  //         let time: any = new Date();
+  //         this.dateDownloadFromApi = time.getTime();
+  //         storage.saveStorage('date', this.dateDownloadFromApi);
+  //         storage.saveStorage('states', responseJson);
+  //     }
+  //     catch(err) {
+  //         throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b)
+  //         // console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.b, ' | ',err)
+  //     }
+  // }
+
+
+  TableWithStates.prototype.downloadFromAPI = function () {
+    var _this = this;
+
+    fetch(this.url).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      console.log('Dane państw pobrane z API:', data);
+
+      if (storage.getStorage('states') && storage.getStorage('states').length > 0) {
+        _this.infoAboutChangingPopulation(storage.getStorage('states'), data);
+      }
+
+      var time = new Date();
+      _this.dateDownloadFromApi = time.getTime();
+      console.log('this.dateDownloadFromApi typ:', _typeof(_this.dateDownloadFromApi), _this.dateDownloadFromApi);
+      storage.saveStorage('date', _this.dateDownloadFromApi);
+      storage.saveStorage('states', data);
+    });
+  }; // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
+
+
+  TableWithStates.prototype.downloadFromApiAgain = function (timeDownloadFromApi) {
+    console.log('start sprawdź datę w localstorage');
+    var MS_IN_6DAYS = 6 * 24 * 60 * 60 * 1000;
+    var MS_FOR_TEST = 30 * 1000;
+    var timeNow = new Date().getTime();
+    var differenceInMs = timeNow - parseFloat(timeDownloadFromApi);
+    console.log('differenceInMs', _typeof(differenceInMs), differenceInMs);
+
+    if (differenceInMs <= MS_FOR_TEST) {
+      console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.a, MS_FOR_TEST + 'ms');
+      return false;
+    } else {
+      console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.b);
+      return true;
+    }
+  }; // porównanie populacji z dwóch zbiorów danych
+
+
+  TableWithStates.prototype.comparePopulationBetweenData = function (stateDataOld, stateDataNew) {
+    // console.log('typ stateDataOld:', typeof stateDataOld, '| ', stateDataOld); //typ object
+    // console.log('typ stateDataNew:', typeof stateDataNew, '| ', stateDataNew);
+    if (stateDataOld.alpha3Code === stateDataNew.alpha3Code) {
+      if (stateDataOld.population !== stateDataNew.population) {
+        // console.log('liczba ludności zmieniła się w: ', stateDataOld.name);
+        this.tableAfterComparison.push(stateDataOld.name);
+        return;
+      }
+    }
+  }; // pętla po starym zestawie danych
+
+
+  TableWithStates.prototype.infoAboutChangingPopulation = function (oldData, newData) {
+    var _this = this;
+
+    console.log('oldData:', Array.isArray(oldData), _typeof(oldData), oldData);
+    console.log('newData:', Array.isArray(newData), _typeof(newData), newData);
+
+    var _loop_1 = function _loop_1(i) {
+      newData.find(function (el) {
+        return _this.comparePopulationBetweenData(el, oldData[i]);
+      });
+    };
+
+    for (var i = 0; i < oldData.length; i++) {
+      _loop_1(i);
+    }
+
+    return this.tableAfterComparison.length > 0 ? console.log(textsForConsoleLog.tableWithStates.infoAboutChangingPopulation.a, this.tableAfterComparison) : console.log(textsForConsoleLog.tableWithStates.infoAboutChangingPopulation.b);
+  };
 
   return TableWithStates;
 }();
 
-var tableWithStates = new TableWithStates();
-console.log('tableWithStates:', tableWithStates);
-tableWithStates.init(); // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
+var tableWithStates = new TableWithStates(); // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
 
-var StorageBrowser = /*#__PURE__*/function () {
-  function StorageBrowser() {
-    _classCallCheck(this, StorageBrowser);
-  }
+var StorageBrowser = function () {
+  function StorageBrowser() {}
 
-  _createClass(StorageBrowser, [{
-    key: "getStorage",
-    value: function getStorage(key) {
-      var content = null;
+  StorageBrowser.prototype.getStorage = function (key) {
+    var content = null;
+    console.log('content w getStorage', 'klucz ', key, _typeof(content), ' zawartość: ', content);
 
-      if (localStorage.getItem(key) !== null || localStorage.getItem(key) !== undefined) {
-        if (localStorage.getItem(key) == 'number') {
-          content = localStorage.getItem(key);
-        } else {
-          content = JSON.parse(localStorage.getItem(key));
-        }
+    if (localStorage.getItem(key) !== null || localStorage.getItem(key) !== undefined) {
+      if (localStorage.getItem(key) == 'number') {
+        content = localStorage.getItem(key);
       } else {
-        content = [];
+        content = JSON.parse(localStorage.getItem(key));
       }
+    } else {
+      content = [];
+    }
 
-      return content;
-    }
-  }, {
-    key: "saveStorage",
-    value: function saveStorage(key, item) {
-      if (item === null || item === undefined) return console.log(textsForConsoleLog.storage.saveStorage.a);
-      if (typeof item == 'number') localStorage.setItem(key, JSON.stringify(item));
-      localStorage.setItem(key, JSON.stringify(item));
-    }
-  }]);
+    return content;
+  };
+
+  StorageBrowser.prototype.saveStorage = function (key, item) {
+    console.log('item w saveStorage', _typeof(item), 'klucz', key, ' zawartość: ', item);
+    if (item === null || item === undefined) return console.log(textsForConsoleLog.storage.saveStorage.a);
+    if (typeof item == 'number') localStorage.setItem(key, "" + item);
+    localStorage.setItem(key, JSON.stringify(item));
+  };
 
   return StorageBrowser;
 }();

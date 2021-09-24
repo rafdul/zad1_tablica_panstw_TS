@@ -17,7 +17,7 @@
 window.onload = function() {
     console.log('App started!');
 
-    // tableWithStates.init();
+    tableWithStates.init();
 }
 
 
@@ -79,34 +79,58 @@ class TableWithStates {
     }
 
     // pobranie danych z API; zapisanie w local storage pobranych danych i timestamp pobrania (wersja async / await)
-    downloadFromAPI = async(): Promise<void> => { 
-        try {
-            const response: Response = await fetch(this.url);
-            const responseJson: {}[] = await response.json();
-            console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, responseJson);
+    // downloadFromAPI = async() => { 
+    //     try {
+    //         const response = await fetch(this.url);
+    //         console.log('response typ:', typeof response, ' zawartość: ', response);
+    //         const responseJson = await response.json();
+    //         console.log('responseJson typ:', typeof responseJson, ', czy tablica?', Array.isArray(responseJson), ' zawartość: ', responseJson);
 
-            if(storage.getStorage('states').length > 0) {
-                this.infoAboutChangingPopulation(storage.getStorage('states'), responseJson);
-            }
+    //         console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, responseJson);
 
-            let time: any = new Date();
-            this.dateDownloadFromApi = time.getTime();
-            storage.saveStorage('date', this.dateDownloadFromApi);
+    //         if(storage.getStorage('states').length > 0) {
+    //             this.infoAboutChangingPopulation(storage.getStorage('states'), responseJson);
+    //         }
 
-            storage.saveStorage('states', responseJson);
-        }
-        catch(err) {
-            throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b)
-            // console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.b, ' | ',err)
-        }
+    //         let time: any = new Date();
+    //         this.dateDownloadFromApi = time.getTime();
+    //         storage.saveStorage('date', this.dateDownloadFromApi);
+
+    //         storage.saveStorage('states', responseJson);
+    //     }
+    //     catch(err) {
+    //         throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b)
+    //         // console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.b, ' | ',err)
+    //     }
+    // }
+
+    downloadFromAPI(): void { 
+        fetch(this.url)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dane państw pobrane z API:', data);
+                if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
+                    this.infoAboutChangingPopulation(storage.getStorage('states'), data);
+                }
+                let time: Date = new Date();
+                this.dateDownloadFromApi = time.getTime();
+                console.log('this.dateDownloadFromApi typ:', typeof this.dateDownloadFromApi, this.dateDownloadFromApi)
+                storage.saveStorage('date', this.dateDownloadFromApi);
+                storage.saveStorage('states', data);
+            });
+
     }
 
+
+
     // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
-    downloadFromApiAgain(timeDownloadFromApi: number): boolean {
+    downloadFromApiAgain(timeDownloadFromApi: string): boolean {
+        console.log('start sprawdź datę w localstorage')
         const MS_IN_6DAYS: number = 6*24*60*60*1000;
-        const MS_FOR_TEST: number = 15*1000;
+        const MS_FOR_TEST: number = 30*1000;
         const timeNow: number = (new Date).getTime();
-        const differenceInMs: number = timeNow - timeDownloadFromApi;
+        const differenceInMs: number = timeNow - parseFloat(timeDownloadFromApi);
+        console.log('differenceInMs', typeof differenceInMs, differenceInMs)
 
         if(differenceInMs <= MS_FOR_TEST) {
             console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.a, MS_FOR_TEST + 'ms')
@@ -148,9 +172,6 @@ class TableWithStates {
 
 
 let tableWithStates = new TableWithStates();
-console.log('tableWithStates:', tableWithStates)
-tableWithStates.init();
-
 
 
 
@@ -158,6 +179,8 @@ tableWithStates.init();
 class StorageBrowser {
     getStorage(key: string): any {
         let content: any = null;
+        console.log('content w getStorage', 'klucz ', key, typeof content, ' zawartość: ', content);
+
         if(localStorage.getItem(key) !== null || localStorage.getItem(key) !== undefined) {
             if(localStorage.getItem(key) == 'number') {
                 content = localStorage.getItem(key);
@@ -171,8 +194,9 @@ class StorageBrowser {
     }
 
     saveStorage(key: string, item: any ) {
+        console.log('item w saveStorage', typeof item, 'klucz', key, ' zawartość: ', item);
         if(item === null || item === undefined) return console.log(textsForConsoleLog.storage.saveStorage.a);
-        if(typeof item == 'number') localStorage.setItem(key, JSON.stringify(item));
+        if(typeof item == 'number') localStorage.setItem(key, `${item}`);
         localStorage.setItem(key, JSON.stringify(item));
     }
 }
