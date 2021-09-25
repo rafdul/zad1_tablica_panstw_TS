@@ -142,32 +142,32 @@ window.onload = function () {
 
 ; // zmienna zawierająca bibliotekę komunikatów w konsoli
 
-var textsForConsoleLog = {
+var logsTexts = {
   tableWithStates: {
     init: {
-      a: 'Pobrałem dane zapisane w localStorage. Liczba państw w localStorage to: ',
-      b: 'Dane państw zapisane w localStorage: ',
-      c: 'Łączę się z API'
+      getFromStorage: 'Pobrałem dane zapisane w localStorage. Liczba państw w localStorage to: ',
+      dataInStorage: 'Dane państw zapisane w localStorage: ',
+      connectWithApi: 'Łączę się z API'
     },
     downloadFromAPI: {
-      a: 'Dane państw pobrane z API:',
-      b: 'Brak łączności z API'
+      success: 'Dane państw pobrane z API:',
+      failure: 'Brak łączności z API'
     },
     downloadFromApiAgain: {
-      a: 'Korzystam z localstorage i nie pobieram nowych danych z API. Od ostatniego pobrania z API upłynęło mniej niż ',
-      b: 'Od ostatniego pobrania z API upłynęło więcej niż 6 dni, więc ponownie pobieram dane z API.'
+      useDataFromStorage: 'Korzystam z localstorage i nie pobieram nowych danych z API. Od ostatniego pobrania z API upłynęło mniej niż ',
+      useDataFromApi: 'Od ostatniego pobrania z API upłynęło więcej niż 6 dni, więc ponownie pobieram dane z API.'
     },
     countTimeFromLastApi: {
-      a: 'Od ostatniego pobrania z API minęło: '
+      timeFromLastApi: 'Od ostatniego pobrania z API minęło: '
     },
     infoAboutChangingPopulation: {
-      a: 'Od ostatniego pobrania z API zmieniła się liczba ludności w krajach: ',
-      b: 'Od ostatniego pobrania z API nie zmieniła się liczba ludności w żadnym kraju.'
+      stateWithChangedPopulation: 'Od ostatniego pobrania z API zmieniła się liczba ludności w krajach: ',
+      noChangeOfPopulation: 'Od ostatniego pobrania z API nie zmieniła się liczba ludności w żadnym kraju.'
     }
   },
   storage: {
     saveStorage: {
-      a: 'Błąd zapisu w localStorage (brak przekazanych danych)'
+      failure: 'Błąd zapisu w localStorage (brak przekazanych danych)'
     }
   }
 };
@@ -181,10 +181,10 @@ var TableWithStates = function () {
 
   TableWithStates.prototype.init = function () {
     if (this.downloadFromApiAgain(storage.getStorage('date')) === false && storage.getStorage('states').length > 0) {
-      console.log(textsForConsoleLog.tableWithStates.init.a, storage.getStorage('states').length);
-      console.log(textsForConsoleLog.tableWithStates.init.b, storage.getStorage('states'));
+      console.log(logsTexts.tableWithStates.init.getFromStorage, storage.getStorage('states').length);
+      console.log(logsTexts.tableWithStates.init.dataInStorage, storage.getStorage('states'));
     } else {
-      console.log(textsForConsoleLog.tableWithStates.init.c);
+      console.log(logsTexts.tableWithStates.init.connectWithApi);
       this.downloadFromAPI();
     }
   }; // pobranie danych z API; zapisanie w local storage pobranych danych i timestamp pobrania (wersja async / await)
@@ -194,7 +194,7 @@ var TableWithStates = function () {
   //         console.log('response typ:', typeof response, ' zawartość: ', response);
   //         const responseJson = await response.json();
   //         console.log('responseJson typ:', typeof responseJson, ', czy tablica?', Array.isArray(responseJson), ' zawartość: ', responseJson);
-  //         console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, responseJson);
+  //         console.log(logsTexts.tableWithStates.downloadFromAPI.a, responseJson);
   //         if(storage.getStorage('states').length > 0) {
   //             this.infoAboutChangingPopulation(storage.getStorage('states'), responseJson);
   //         }
@@ -204,8 +204,8 @@ var TableWithStates = function () {
   //         storage.saveStorage('states', responseJson);
   //     }
   //     catch(err) {
-  //         throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b)
-  //         // console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.b, ' | ',err)
+  //         throw new Error(logsTexts.tableWithStates.downloadFromAPI.b)
+  //         // console.log(logsTexts.tableWithStates.downloadFromAPI.b, ' | ',err)
   //     }
   // }
 
@@ -216,7 +216,7 @@ var TableWithStates = function () {
     fetch(this.url).then(function (response) {
       return response.json();
     }).then(function (data) {
-      console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, data);
+      console.log(logsTexts.tableWithStates.downloadFromAPI.success, data);
 
       if (storage.getStorage('states') && storage.getStorage('states').length > 0) {
         _this.infoAboutChangingPopulation(storage.getStorage('states'), data);
@@ -227,7 +227,7 @@ var TableWithStates = function () {
       storage.saveStorage('date', _this.dateDownloadFromApi);
       storage.saveStorage('states', data);
     }).catch(function (err) {
-      throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b);
+      throw new Error(logsTexts.tableWithStates.downloadFromAPI.failure);
     });
   }; // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
 
@@ -243,27 +243,23 @@ var TableWithStates = function () {
       this.countTimeFromLastApi(differenceInMs);
     }
 
-    if (differenceInMs <= MS_IN_6DAYS) {
-      console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.a, MS_IN_6DAYS + 'ms');
+    if (differenceInMs <= MS_FOR_TEST) {
+      console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_FOR_TEST + 'ms');
       return false;
     } else {
-      console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.b);
+      console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromApi);
       return true;
     }
   }; //  oblicza czas od ostaniego pobrania z API
 
 
-  TableWithStates.prototype.countTimeFromLastApi = function (timeDownload) {
-    var sek = timeDownload / 1000;
-    var min = sek / 60;
-    var hours = min / 60;
-    var days = hours / 24;
-    var leftSek = Math.floor(sek % 60);
-    var leftMin = Math.floor(min % 60);
-    var leftHours = Math.floor(hours % 24);
-    var leftDays = Math.floor(days);
-    var result = leftDays + " dni, " + leftHours + " godzin, " + leftMin + " min, " + leftSek + " sek";
-    console.log(textsForConsoleLog.tableWithStates.countTimeFromLastApi.a, result);
+  TableWithStates.prototype.countTimeFromLastApi = function (timeDownloadInMs) {
+    var s = Math.floor(timeDownloadInMs / 1000 % 60);
+    var m = Math.floor(timeDownloadInMs / 1000 / 60 % 60);
+    var h = Math.floor(timeDownloadInMs / 1000 / 60 / 60 % 24);
+    var d = Math.floor(timeDownloadInMs / 1000 / 60 / 60 / 24);
+    var result = d + " dni, " + h + " godzin, " + m + " min, " + s + " sek";
+    console.log(logsTexts.tableWithStates.countTimeFromLastApi.timeFromLastApi, result);
   }; // porównanie populacji z dwóch zbiorów danych
 
 
@@ -292,7 +288,7 @@ var TableWithStates = function () {
       _loop_1(i);
     }
 
-    return this.tableAfterComparison.length > 0 ? console.log(textsForConsoleLog.tableWithStates.infoAboutChangingPopulation.a, this.tableAfterComparison) : console.log(textsForConsoleLog.tableWithStates.infoAboutChangingPopulation.b);
+    return this.tableAfterComparison.length > 0 ? console.log(logsTexts.tableWithStates.infoAboutChangingPopulation.stateWithChangedPopulation, this.tableAfterComparison) : console.log(logsTexts.tableWithStates.infoAboutChangingPopulation.noChangeOfPopulation);
   };
 
   return TableWithStates;
@@ -328,7 +324,7 @@ var StorageBrowser = function () {
   StorageBrowser.prototype.saveStorage = function (key, item) {
     // console.log('item w saveStorage', typeof item, 'klucz', key, ' zawartość: ', item);
     if (item === null || item === undefined) {
-      return console.log(textsForConsoleLog.storage.saveStorage.a);
+      return console.log(logsTexts.storage.saveStorage.failure);
     }
 
     ;

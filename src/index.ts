@@ -24,44 +24,44 @@ window.onload = function() {
 // interfejsy zmiennych
 interface Texts {
     tableWithStates: {
-        init: {a: string, b: string, c: string},
-        downloadFromAPI: {a: string, b: string},
-        downloadFromApiAgain: {a: string, b: string},
-        countTimeFromLastApi: {a: string},
-        infoAboutChangingPopulation: {a: string, b: string},
+        init: {getFromStorage: string, dataInStorage: string, connectWithApi: string},
+        downloadFromAPI: {success: string, failure: string},
+        downloadFromApiAgain: {useDataFromStorage: string, useDataFromApi: string},
+        countTimeFromLastApi: {timeFromLastApi: string},
+        infoAboutChangingPopulation: {stateWithChangedPopulation: string, noChangeOfPopulation: string},
     },
     storage: {
-        saveStorage: {a: string}
+        saveStorage: {failure: string}
     }
 };
 
 // zmienna zawierająca bibliotekę komunikatów w konsoli
-var textsForConsoleLog: Texts = {
+var logsTexts: Texts = {
     tableWithStates: {
         init: {
-            a: 'Pobrałem dane zapisane w localStorage. Liczba państw w localStorage to: ',
-            b: 'Dane państw zapisane w localStorage: ',
-            c: 'Łączę się z API',
+            getFromStorage: 'Pobrałem dane zapisane w localStorage. Liczba państw w localStorage to: ',
+            dataInStorage: 'Dane państw zapisane w localStorage: ',
+            connectWithApi: 'Łączę się z API',
         },
         downloadFromAPI: {
-            a: 'Dane państw pobrane z API:',
-            b: 'Brak łączności z API',
+            success: 'Dane państw pobrane z API:',
+            failure: 'Brak łączności z API',
         },
         downloadFromApiAgain: {
-            a: 'Korzystam z localstorage i nie pobieram nowych danych z API. Od ostatniego pobrania z API upłynęło mniej niż ',
-            b: 'Od ostatniego pobrania z API upłynęło więcej niż 6 dni, więc ponownie pobieram dane z API.',
+            useDataFromStorage: 'Korzystam z localstorage i nie pobieram nowych danych z API. Od ostatniego pobrania z API upłynęło mniej niż ',
+            useDataFromApi: 'Od ostatniego pobrania z API upłynęło więcej niż 6 dni, więc ponownie pobieram dane z API.',
         },
         countTimeFromLastApi: {
-            a: 'Od ostatniego pobrania z API minęło: ',
+            timeFromLastApi: 'Od ostatniego pobrania z API minęło: ',
         },
         infoAboutChangingPopulation: {
-            a: 'Od ostatniego pobrania z API zmieniła się liczba ludności w krajach: ',
-            b: 'Od ostatniego pobrania z API nie zmieniła się liczba ludności w żadnym kraju.',
+            stateWithChangedPopulation: 'Od ostatniego pobrania z API zmieniła się liczba ludności w krajach: ',
+            noChangeOfPopulation: 'Od ostatniego pobrania z API nie zmieniła się liczba ludności w żadnym kraju.',
         }
     },
     storage: {
         saveStorage: {
-            a: 'Błąd zapisu w localStorage (brak przekazanych danych)',
+            failure: 'Błąd zapisu w localStorage (brak przekazanych danych)',
         }
     }
 }
@@ -74,10 +74,10 @@ class TableWithStates {
 
     init(): void {
         if( this.downloadFromApiAgain( storage.getStorage('date') ) === false && storage.getStorage('states').length > 0 ) {
-            console.log(textsForConsoleLog.tableWithStates.init.a, storage.getStorage('states').length);
-            console.log(textsForConsoleLog.tableWithStates.init.b, storage.getStorage('states'));
+            console.log(logsTexts.tableWithStates.init.getFromStorage, storage.getStorage('states').length);
+            console.log(logsTexts.tableWithStates.init.dataInStorage, storage.getStorage('states'));
         } else {
-            console.log(textsForConsoleLog.tableWithStates.init.c);
+            console.log(logsTexts.tableWithStates.init.connectWithApi);
             this.downloadFromAPI();
         }
     }
@@ -90,7 +90,7 @@ class TableWithStates {
     //         const responseJson = await response.json();
     //         console.log('responseJson typ:', typeof responseJson, ', czy tablica?', Array.isArray(responseJson), ' zawartość: ', responseJson);
 
-    //         console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, responseJson);
+    //         console.log(logsTexts.tableWithStates.downloadFromAPI.a, responseJson);
 
     //         if(storage.getStorage('states').length > 0) {
     //             this.infoAboutChangingPopulation(storage.getStorage('states'), responseJson);
@@ -103,8 +103,8 @@ class TableWithStates {
     //         storage.saveStorage('states', responseJson);
     //     }
     //     catch(err) {
-    //         throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b)
-    //         // console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.b, ' | ',err)
+    //         throw new Error(logsTexts.tableWithStates.downloadFromAPI.b)
+    //         // console.log(logsTexts.tableWithStates.downloadFromAPI.b, ' | ',err)
     //     }
     // }
 
@@ -112,7 +112,7 @@ class TableWithStates {
         fetch(this.url)
             .then(response => response.json())
             .then(data => {
-                console.log(textsForConsoleLog.tableWithStates.downloadFromAPI.a, data);
+                console.log(logsTexts.tableWithStates.downloadFromAPI.success, data);
 
                 if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
                     this.infoAboutChangingPopulation(storage.getStorage('states'), data);
@@ -125,7 +125,7 @@ class TableWithStates {
                 storage.saveStorage('states', data);
             })
             .catch(err => {
-                throw new Error(textsForConsoleLog.tableWithStates.downloadFromAPI.b)
+                throw new Error(logsTexts.tableWithStates.downloadFromAPI.failure)
             })
     }
 
@@ -141,30 +141,25 @@ class TableWithStates {
             this.countTimeFromLastApi(differenceInMs);
         }
 
-        if(differenceInMs <= MS_IN_6DAYS) {
-            console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.a, MS_IN_6DAYS + 'ms')
+        if(differenceInMs <= MS_FOR_TEST) {
+            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_FOR_TEST + 'ms')
             return false;
         } else {
-            console.log(textsForConsoleLog.tableWithStates.downloadFromApiAgain.b)
+            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromApi)
             return true;
         }
     }
 
     //  oblicza czas od ostaniego pobrania z API
-    countTimeFromLastApi(timeDownload: number): void {
-        let sek: number = timeDownload/1000;
-        let min: number = sek/60;
-        let hours: number = min/60;
-        let days: number = hours/24
+    countTimeFromLastApi(timeDownloadInMs: number): void {
+        let s: number = Math.floor((timeDownloadInMs/1000)%60); 
+        let m: number = Math.floor((timeDownloadInMs/1000/60)%60); 
+        let h: number = Math.floor((timeDownloadInMs/1000/60/60)%24); 
+        let d: number = Math.floor((timeDownloadInMs/1000/60/60/24)); 
 
-        let leftSek: number = Math.floor(sek%60);
-        let leftMin: number = Math.floor(min%60);
-        let leftHours: number = Math.floor(hours%24);
-        let leftDays: number = Math.floor(days);
+        let result = `${d} dni, ${h} godzin, ${m} min, ${s} sek`;
 
-        let result = `${leftDays} dni, ${leftHours} godzin, ${leftMin} min, ${leftSek} sek`;
-
-        console.log(textsForConsoleLog.tableWithStates.countTimeFromLastApi.a, result)
+        console.log(logsTexts.tableWithStates.countTimeFromLastApi.timeFromLastApi, result)
     }
 
     // porównanie populacji z dwóch zbiorów danych
@@ -185,8 +180,8 @@ class TableWithStates {
             }
         }
         return (this.tableAfterComparison.length > 0) 
-            ? console.log(textsForConsoleLog.tableWithStates.infoAboutChangingPopulation.a, this.tableAfterComparison) 
-            : console.log(textsForConsoleLog.tableWithStates.infoAboutChangingPopulation.b);
+            ? console.log(logsTexts.tableWithStates.infoAboutChangingPopulation.stateWithChangedPopulation, this.tableAfterComparison) 
+            : console.log(logsTexts.tableWithStates.infoAboutChangingPopulation.noChangeOfPopulation);
     }
 }
 
@@ -217,7 +212,7 @@ class StorageBrowser {
     saveStorage(key: string, item: any ): void {
         // console.log('item w saveStorage', typeof item, 'klucz', key, ' zawartość: ', item);
         if(item === null || item === undefined) {
-            return console.log(textsForConsoleLog.storage.saveStorage.a)
+            return console.log(logsTexts.storage.saveStorage.failure)
         };
         if(typeof item == 'number') {
             localStorage.setItem(key, `${item}`)
