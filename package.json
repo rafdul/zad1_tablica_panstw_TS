@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --colors"
   },
   "repository": {
     "type": "git",
@@ -18,8 +20,13 @@
   },
   "homepage": "https://github.com/rafdul/zad1_tablica_panstw_TS#readme",
   "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "jest": "^27.2.2",
+    "jest-watch-typeahead": "^0.3.1",
     "nodemon": "^2.0.12",
     "parcel-bundler": "^1.12.5",
-    "typescript": "^4.4.2"
-  }
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {}
 }
