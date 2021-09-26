@@ -163,14 +163,9 @@ class TableWithStates {
     }
 
     // porównanie populacji z dwóch zbiorów danych
-    comparePopulationBetweenData(stateDataOld: any, stateDataNew:any) {
-        // if(stateDataOld.alpha3Code === stateDataNew.alpha3Code) {
-        //     if(stateDataOld.population !== stateDataNew.population) {
-        //         this.tableAfterComparison.push(stateDataOld.name);
-        //         return ;
-        //     } 
-        // } 
-        if(stateDataOld.alpha3Code === stateDataNew.alpha3Code && stateDataOld.population !== stateDataNew.population) {
+    comparePopulationBetweenData(stateDataOld: any, stateDataNew:any) { 
+        if(stateDataOld.alpha3Code === stateDataNew.alpha3Code && 
+            stateDataOld.population !== stateDataNew.population) {
             this.tableAfterComparison.push(stateDataOld.name);
             return ;
         }
