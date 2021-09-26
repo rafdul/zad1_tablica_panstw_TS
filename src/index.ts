@@ -66,7 +66,7 @@ var logsTexts: Texts = {
     }
 }
 
-class TableWithStates {
+export class TableWithStates {
 
     url: string = "https://restcountries.com/v3/all";
     dateDownloadFromApi: number = 0;
@@ -188,7 +188,7 @@ class TableWithStates {
 let tableWithStates = new TableWithStates();
 
 // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
-class StorageBrowser {
+export class StorageBrowser {
     getStorage(key: string): any {
         let content: number[] | [] = [];
         let contentInLocalStorage: string|null = localStorage.getItem(key);
