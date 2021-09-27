@@ -31,7 +31,8 @@ interface Texts {
         infoAboutChangingPopulation: {stateWithChangedPopulation: string, noChangeOfPopulation: string},
     },
     storage: {
-        saveStorage: {failure: string}
+        saveStorage: {failure: string},
+        getStorage: {failure: string},
     }
 };
 
@@ -62,6 +63,9 @@ var logsTexts: Texts = {
     storage: {
         saveStorage: {
             failure: 'Błąd zapisu w localStorage (brak przekazanych danych)',
+        },
+        getStorage: {
+            failure: 'W localStorage nie ma danych pod kluczem ',
         }
     }
 }
@@ -130,18 +134,21 @@ export class TableWithStates {
     }
 
     // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
-    downloadFromApiAgain(timeDownloadFromApi: number[]): boolean {
+    downloadFromApiAgain(timeDownloadFromApi: number | null): boolean {
         const MS_IN_6DAYS: number = 6*24*60*60*1000;
         const MS_FOR_TEST: number = 30*1000;
         const timeNow: number = (new Date).getTime();
-        let differenceInMs: number = 0
-        if(timeDownloadFromApi.length === 1) {
-            differenceInMs = timeNow - timeDownloadFromApi[0];
+        let differenceInMs: number | null = 0;
 
+        if(typeof timeDownloadFromApi === 'number') {
+            differenceInMs = timeNow - timeDownloadFromApi;
             this.countTimeFromLastApi(differenceInMs);
-        }
+        };
+        if(typeof timeDownloadFromApi === null) {
+            differenceInMs = null;
+        };
 
-        if(differenceInMs <= MS_FOR_TEST) {
+        if(differenceInMs === null || differenceInMs <= MS_FOR_TEST) {
             console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_FOR_TEST + 'ms')
             return false;
         } else {
@@ -190,20 +197,14 @@ let tableWithStates = new TableWithStates();
 // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
 export class StorageBrowser {
     getStorage(key: string): any {
-        let content: number[] | [] = [];
+        let content: number | [] | null = null;
         let contentInLocalStorage: string|null = localStorage.getItem(key);
 
-        if(contentInLocalStorage !== null) {
-            let fromJSON: any = JSON.parse(contentInLocalStorage);
-            if (typeof fromJSON === 'number') {
-                let newTab: number[] = [];
-                newTab.push(fromJSON);
-                content = newTab;
-            } else {
-                content = fromJSON;
-            }            
+        if(contentInLocalStorage !== null) { 
+            content = JSON.parse(contentInLocalStorage);
         } else {
-            content = [];
+            content = null;
+            console.log(logsTexts.storage.getStorage.failure, key);
         }
         // console.log(key, 'content', typeof content, 'czy tablica: ', Array.isArray(content));
         return content;

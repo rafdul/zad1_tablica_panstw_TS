@@ -9,48 +9,50 @@ test('3 is equal to 2', () => {
     expect(3).not.toBe(2);
 });
 
-// test for index.ts
-test('newTableWithStatesFromAPI is instance of TableWithStates', () => {
+// test for class TableWithStates
+describe('Check', () => {
     const newTableWithStatesFromAPI = new TableWithStates();
-    expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
-})
+    
+    test('if newTableWithStatesFromAPI is instance of TableWithStates', () => {
+        expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
+    });
+});
 
-describe('newStorage', () => {
-    const newStorage = new StorageBrowser();
+// test for class StorageBrowser
+describe('Check', () => {
+    // const newStorage = new StorageBrowser();
     let keyObject: string = 'testObject';
     let resultObject: {}[] = [{name: 'lorem', surname: 'ipsum', id: 1}, {name: 'adam', surname: 'mickiewicz', id: 2}];
     let keyNumber: string = 'testNumber';
     let resultNumber: number = 12345;
     let keyEmpty: string = 'testEmpty';
     let resultEmpty: any = null;
-    let keyUndefined: string = 'testUndefined';
-    let resultUndefined: any = undefined;
 
-    // console.log('newStorage', newStorage);
-
-    test('is instance of StorageBrowser', () => {
+    test('if newStorage is instance of StorageBrowser', () => {
+        const newStorage = new StorageBrowser();
         expect(newStorage).toBeInstanceOf(StorageBrowser);
     })
 
-    test('has method for setting (saveStorage) and getting of localStorage (getStorage)', () => {
+    test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for objects', () => {
+        const newStorage = new StorageBrowser();
         newStorage.saveStorage(keyObject, resultObject);
         let testObjectFromStorage = newStorage.getStorage(keyObject);
         expect(testObjectFromStorage[0].surname).toBe('ipsum');
         expect(testObjectFromStorage[1].id).toBe(2);
+    });
 
+    test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for number', () => {
+        const newStorage = new StorageBrowser();
         newStorage.saveStorage(keyNumber, resultNumber);
         let testNumberFromStorage = newStorage.getStorage(keyNumber);
-        expect(testNumberFromStorage.length).toBe(1);
-        expect(testNumberFromStorage[0]).toBe(resultNumber);
+        expect(testNumberFromStorage).toBe(12345);
+    });
 
+    test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for null', () => {
+        const newStorage = new StorageBrowser();
         newStorage.saveStorage(keyEmpty, resultEmpty);
         let testEmptyFromStorage = newStorage.getStorage(keyEmpty);
-        expect(Array.isArray(testEmptyFromStorage)).toBeTruthy();
-        expect(testEmptyFromStorage.length).toBe(0);
-
-        newStorage.saveStorage(keyUndefined, resultUndefined);
-        let testUndefinedFromStorage = newStorage.getStorage(keyUndefined);
-        expect(Array.isArray(testUndefinedFromStorage)).toBeTruthy();
-        expect(testUndefinedFromStorage.length).toBe(0);
+        expect(testEmptyFromStorage).toBe(resultEmpty);
+        // expect(typeof testEmptyFromStorage).toBe(null);
     });
-})
+});
