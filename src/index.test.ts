@@ -1,24 +1,64 @@
+// global.fetch = require('jest-fetch-mock');
+import fetchMock from "jest-fetch-mock"
+
 import { TableWithStates, StorageBrowser } from './index';
 
 // test for class TableWithStates
-describe('Check', () => {
+describe('Tests class TableWithStates. Check,', () => {
     let newTableWithStatesFromAPI: any = null;
+    let newStorage: any = null;
+    const url: string = "https://restcountries.com/v3/all";
+    let dateDownloadFromApi: number = 0;
+    let tableAfterComparison: Array<{}> = [];
+    const states = [{id: 1, name: 'Angola', population: 10000000}, {id: 2, name: 'Bostwana', population: 5000000}, {id: 3, name: 'Kenia', population: 50000000}]
+
 
     beforeEach(() => {
-        return newTableWithStatesFromAPI = new TableWithStates();
+        newTableWithStatesFromAPI = new TableWithStates();
+        newStorage = new StorageBrowser();
+        fetchMock.resetMocks()
     });
 
     afterEach(() => {
-        return newTableWithStatesFromAPI = null;
+        newTableWithStatesFromAPI = null;
+        newStorage = null
     });
     
     test('if new object is created as instance of TableWithStates', () => {
         expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
     });
+
+    test('if use local storage or API again', () => {
+        const MS_IN_6DAYS: number = 6*24*60*60*1000;
+        // const MS_FOR_TEST: number = 30*1000;
+        const timeNow: number = (new Date).getTime();
+
+        let number6Days: number = timeNow - MS_IN_6DAYS;
+        let numberGreaterThan6Days: number = timeNow - MS_IN_6DAYS - 1;
+        let numberLess6Days: number = timeNow - 1;
+        let numberLess6Days2: number = timeNow - MS_IN_6DAYS + 1000;
+        let numberLess6Days3: number = timeNow - 1000;
+        let notNumber: null = null;
+
+        let arrApi = [number6Days, numberGreaterThan6Days, notNumber];
+        let arrStorage = [numberLess6Days, numberLess6Days2, numberLess6Days3]
+
+        for(let i=0; i<arrApi.length; i++) {
+            console.log('+++storage+++', arrApi[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i]))
+            expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i])).toBe('api')
+        }
+
+        for(let i=0; i<arrStorage.length; i++) {
+            console.log('====storage===', arrStorage[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i]))
+            expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i])).toBe('storage')
+        }
+    })
+
+
 });
 
 // test for class StorageBrowser
-describe('Check', () => {
+describe('Tests class StorageBrowser. Check,', () => {
     let keyObject: string = 'testObject';
     let resultObject: {}[] = [{name: 'lorem', surname: 'ipsum', id: 1}, {name: 'adam', surname: 'mickiewicz', id: 2}];
     let keyArray: string = 'testArray';

@@ -75,9 +75,10 @@ export class TableWithStates {
     url: string = "https://restcountries.com/v3/all";
     dateDownloadFromApi: number = 0;
     tableAfterComparison: Array<{}> = [];
+    // flagStorageOrApi: string = '';
 
     init(): void {
-        if( this.downloadFromApiAgain( storage.getStorage('date') ) === false && storage.getStorage('states').length > 0 ) {
+        if( this.downloadFromApiAgain( storage.getStorage('date') ) === 'storage' && storage.getStorage('states').length > 0 ) {
             console.log(logsTexts.tableWithStates.init.getFromStorage, storage.getStorage('states').length);
             console.log(logsTexts.tableWithStates.init.dataInStorage, storage.getStorage('states'));
         } else {
@@ -134,27 +135,31 @@ export class TableWithStates {
     }
 
     // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
-    downloadFromApiAgain(timeDownloadFromApi: number | null): boolean {
+    downloadFromApiAgain(timeDownloadFromApi: number | null): string {
         const MS_IN_6DAYS: number = 6*24*60*60*1000;
         const MS_FOR_TEST: number = 30*1000;
         const timeNow: number = (new Date).getTime();
-        let differenceInMs: number | null = 0;
+        console.log('timeNow', timeNow);
+        let differenceInMs: number = 0;
 
         if(typeof timeDownloadFromApi === 'number') {
             differenceInMs = timeNow - timeDownloadFromApi;
             this.countTimeFromLastApi(differenceInMs);
         };
-        if(typeof timeDownloadFromApi === null) {
-            differenceInMs = null;
+        if(timeDownloadFromApi === null) {
+            differenceInMs = MS_IN_6DAYS;
         };
+        console.log('differenceInMs', differenceInMs);
 
-        if(differenceInMs === null || differenceInMs <= MS_FOR_TEST) {
-            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_FOR_TEST + 'ms')
-            return false;
+        if(differenceInMs >= MS_IN_6DAYS) {
+            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromApi);
+            return 'api';
         } else {
-            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromApi)
-            return true;
+            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_IN_6DAYS + 'ms');
+            return 'storage';
         }
+            
+        // return this.flagStorageOrApi = flag;
     }
 
     //  oblicza czas od ostaniego pobrania z API
