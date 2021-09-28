@@ -72,7 +72,7 @@ var logsTexts: Texts = {
 
 export class TableWithStates {
 
-    url: string = "https://restcountries.com/v3/all";
+    url: string = "https://restcountries.com/v2/all";
     dateDownloadFromApi: number = 0;
     tableAfterComparison: Array<{}> = [];
     // flagStorageOrApi: string = '';
@@ -90,14 +90,14 @@ export class TableWithStates {
     // pobranie danych z API; zapisanie w local storage pobranych danych i timestamp pobrania (wersja async / await)
     // downloadFromAPI = async() => { 
     //     try {
-    //         const response = await fetch(this.url);
+    //         const response: Response = await fetch(this.url);
     //         console.log('response typ:', typeof response, ' zawartość: ', response);
-    //         const responseJson = await response.json();
+    //         const responseJson: any = await response.json();
     //         console.log('responseJson typ:', typeof responseJson, ', czy tablica?', Array.isArray(responseJson), ' zawartość: ', responseJson);
 
-    //         console.log(logsTexts.tableWithStates.downloadFromAPI.a, responseJson);
+    //         console.log(logsTexts.tableWithStates.downloadFromAPI.success, responseJson);
 
-    //         if(storage.getStorage('states').length > 0) {
+    //         if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
     //             this.infoAboutChangingPopulation(storage.getStorage('states'), responseJson);
     //         }
 
@@ -108,7 +108,7 @@ export class TableWithStates {
     //         storage.saveStorage('states', responseJson);
     //     }
     //     catch(err) {
-    //         throw new Error(logsTexts.tableWithStates.downloadFromAPI.b)
+    //         throw new Error(logsTexts.tableWithStates.downloadFromAPI.failure)
     //         // console.log(logsTexts.tableWithStates.downloadFromAPI.b, ' | ',err)
     //     }
     // }
@@ -139,7 +139,6 @@ export class TableWithStates {
         const MS_IN_6DAYS: number = 6*24*60*60*1000;
         const MS_FOR_TEST: number = 30*1000;
         const timeNow: number = (new Date).getTime();
-        console.log('timeNow', timeNow);
         let differenceInMs: number = 0;
 
         if(typeof timeDownloadFromApi === 'number') {
@@ -149,7 +148,6 @@ export class TableWithStates {
         if(timeDownloadFromApi === null) {
             differenceInMs = MS_IN_6DAYS;
         };
-        console.log('differenceInMs', differenceInMs);
 
         if(differenceInMs >= MS_IN_6DAYS) {
             console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromApi);
@@ -181,7 +179,6 @@ export class TableWithStates {
             this.tableAfterComparison.push(stateDataOld.name);
             return ;
         }
-
     }
 
     // pętla po starym zestawie danych

@@ -28,34 +28,83 @@ describe('Tests class TableWithStates. Check,', () => {
         expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
     });
 
-    test('if use local storage or API again', () => {
-        const MS_IN_6DAYS: number = 6*24*60*60*1000;
-        // const MS_FOR_TEST: number = 30*1000;
-        const timeNow: number = (new Date).getTime();
+});
 
-        let number6Days: number = timeNow - MS_IN_6DAYS;
-        let numberGreaterThan6Days: number = timeNow - MS_IN_6DAYS - 1;
-        let numberLess6Days: number = timeNow - 1;
-        let numberLess6Days2: number = timeNow - MS_IN_6DAYS + 1000;
-        let numberLess6Days3: number = timeNow - 1000;
-        let notNumber: null = null;
+describe('Tests class TableWithStates. Check, if app use local storage or API again:', () => {
+    let newTableWithStatesFromAPI: any = null;
+    const MS_IN_6DAYS: number = 6*24*60*60*1000;
+    const MS_FOR_TEST: number = 30*1000;
+    const timeNow: number = (new Date).getTime();
 
-        let arrApi = [number6Days, numberGreaterThan6Days, notNumber];
-        let arrStorage = [numberLess6Days, numberLess6Days2, numberLess6Days3]
+    let number6Days: number = timeNow - MS_IN_6DAYS;
+    let numberGreaterThan6Days: number = timeNow - MS_IN_6DAYS - 1;
+    let numberLess6Days: number = timeNow - 1;
+    let numberLess6Days2: number = timeNow - MS_IN_6DAYS + 1000;
+    let numberLess6Days3: number = timeNow - 1000;
+    let notNumber: null = null;
 
+    let arrApi = [number6Days, numberGreaterThan6Days, notNumber];
+    let arrStorage = [numberLess6Days, numberLess6Days2, numberLess6Days3]
+
+    beforeEach(() => {
+        newTableWithStatesFromAPI = new TableWithStates();
+    });
+
+    afterEach(() => {
+        newTableWithStatesFromAPI = null;
+    });
+
+    test('- app should choose API', () => {
         for(let i=0; i<arrApi.length; i++) {
-            console.log('+++storage+++', arrApi[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i]))
+            // console.log('+++storage+++', arrApi[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i]))
             expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i])).toBe('api')
-        }
-
-        for(let i=0; i<arrStorage.length; i++) {
-            console.log('====storage===', arrStorage[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i]))
-            expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i])).toBe('storage')
         }
     })
 
+    test('- app should choose local storage', () => {
+        for(let i=0; i<arrStorage.length; i++) {
+            // console.log('====storage===', arrStorage[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i]))
+            expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i])).toBe('storage')
+        }
+    })
+})
 
-});
+describe('Tests class TableWithStates. Check, if app compares population between new and old data:', () => {
+    let newTableWithStatesFromAPI: any = null;
+    let arrWithNewPopulation: Array<{}> = [];
+    const newData: Array<{}> = [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 10000000}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000}];
+    const oldData1: Array<{}>  = [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 9000000}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000}];
+    const oldData2: Array<{}>  = [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 10000000}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000}];
+
+
+    beforeEach(() => {
+        newTableWithStatesFromAPI = new TableWithStates();
+    });
+
+    afterEach(() => {
+        newTableWithStatesFromAPI = null;
+        arrWithNewPopulation = [];
+    });
+
+    test('- there are differences between new and old data', () => {
+        arrWithNewPopulation = newTableWithStatesFromAPI.tableAfterComparison;
+        newTableWithStatesFromAPI.infoAboutChangingPopulation(oldData1,newData);
+        
+        // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
+        expect(arrWithNewPopulation.length).toBe(1);
+        expect(arrWithNewPopulation[0]).toBe('Angola');
+    })
+
+    test('- there are NOT differences between new and old data', () => {
+        arrWithNewPopulation = newTableWithStatesFromAPI.tableAfterComparison;
+        newTableWithStatesFromAPI.infoAboutChangingPopulation(oldData2,newData);
+        
+        // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
+        expect(arrWithNewPopulation.length).toBe(0);
+        expect(arrWithNewPopulation[0]).toBe(undefined);
+    })
+
+})
 
 // test for class StorageBrowser
 describe('Tests class StorageBrowser. Check,', () => {
