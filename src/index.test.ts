@@ -1,33 +1,48 @@
-// global.fetch = require('jest-fetch-mock');
-import fetchMock from "jest-fetch-mock"
-
 import { TableWithStates, StorageBrowser } from './index';
+
 
 // test for class TableWithStates
 describe('Tests class TableWithStates. Check,', () => {
     let newTableWithStatesFromAPI: any = null;
-    let newStorage: any = null;
-    const url: string = "https://restcountries.com/v3/all";
-    let dateDownloadFromApi: number = 0;
-    let tableAfterComparison: Array<{}> = [];
-    const states = [{id: 1, name: 'Angola', population: 10000000}, {id: 2, name: 'Bostwana', population: 5000000}, {id: 3, name: 'Kenia', population: 50000000}]
-
+    // let newStorage: any = null;
+    const states: Array<{}> = [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 10000000}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000}];
+    const unmockedFetch: any = global.fetch;
 
     beforeEach(() => {
         newTableWithStatesFromAPI = new TableWithStates();
-        newStorage = new StorageBrowser();
-        fetchMock.resetMocks()
+        // newStorage = new StorageBrowser();
+        
+        global.fetch = (): any => Promise.resolve({
+            json: () => Promise.resolve(states),
+        })
     });
 
     afterEach(() => {
         newTableWithStatesFromAPI = null;
-        newStorage = null
+        // newStorage = null
+        global.fetch = unmockedFetch;
     });
     
     test('if new object is created as instance of TableWithStates', () => {
         expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
     });
 
+    test('if app can connect with API (fetch in downloadFromAPI)', async () => {
+        
+        try{
+            const response = await fetch(JSON.stringify(states));
+            const responseJson = await response.json();
+            // console.log('z api:', typeof responseJson, responseJson.length);
+
+            expect(Array.isArray(responseJson)).toEqual(true);
+            expect(responseJson.length).toEqual(3);
+            expect(responseJson[2].name).toEqual('Kenia');
+
+        } catch(err) {
+            console.log(err)
+        }
+
+    });
 });
 
 describe('Tests class TableWithStates. Check, if app use local storage or API again:', () => {
@@ -69,7 +84,7 @@ describe('Tests class TableWithStates. Check, if app use local storage or API ag
     })
 })
 
-describe('Tests class TableWithStates. Check, if app compares population between new and old data:', () => {
+describe('Tests class TableWithStates. Check, if app can compare population between new and old data:', () => {
     let newTableWithStatesFromAPI: any = null;
     let arrWithNewPopulation: Array<{}> = [];
     const newData: Array<{}> = [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 10000000}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000}];
@@ -137,7 +152,7 @@ describe('Tests class StorageBrowser. Check,', () => {
         expect(testObjectFromStorage[1].id).toEqual(2);
     });
 
-    test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for number', () => {
+    test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for numbers', () => {
         newStorage.saveStorage(keyNumber, resultNumber);
         let testNumberFromStorage = newStorage.getStorage(keyNumber);
         expect(testNumberFromStorage).toBe(12345);
@@ -149,7 +164,7 @@ describe('Tests class StorageBrowser. Check,', () => {
         expect(testEmptyFromStorage).toBe(resultEmpty);
     });
 
-    test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for array', () => {
+    test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for arrays', () => {
         newStorage.saveStorage(keyArray, resultArray);
         let testArrayFromStorage = newStorage.getStorage(keyArray);
         expect(testArrayFromStorage.length).toEqual(5);
