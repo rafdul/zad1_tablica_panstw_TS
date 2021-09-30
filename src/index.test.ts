@@ -6,7 +6,7 @@ let fromStorage: any = null;
 let fromAPI: any = null;
 let downloadFromApiAgain: string = '';
 const MS_IN_6DAYS: number = 6*24*60*60*1000;
-const MS_FOR_TEST: number = 30*1000;
+// const MS_FOR_TEST: number = 30*1000;
 const timeNow: number = (new Date).getTime();
 
 interface Values {
@@ -18,7 +18,14 @@ interface Values {
     arr: {key: string, res: string[]},
     num: {key: string, res: number},
     empty: {key: string, res: null},
-    time: {number6Days: number, numberGreaterThan6Days: number, numberLess6Days: number, numberLess6Days2: number, numberLess6Days3: number, notNumber: null},
+    time: {
+        number6Days: number, 
+        numberGreaterThan6Days: number, 
+        numberLess6Days: number, 
+        numberLess6Days2: number, 
+        numberLess6Days3: number, 
+        notNumber: null,
+    },
 }
 
 const mockValues: Values = {
@@ -40,8 +47,17 @@ const mockValues: Values = {
     },
 }
 
+function mockFunc(): void {
+    newTableWithStatesFromAPI.init = (): void => {
+        if(downloadFromApiAgain === 'storage' && newStorage.getStorage('states').length > 0) {
+            return fromStorage;
+        } else {
+            return fromAPI;
+        }
+    }
+}
 
-// test for class TableWithStates
+// tests for class TableWithStates
 describe('Tests class TableWithStates. Check,', () => {
     const states: Array<{}> = mockValues.states0;
     const unmockedFetch: any = global.fetch;
@@ -67,8 +83,7 @@ describe('Tests class TableWithStates. Check,', () => {
         try{
             const response = await fetch(JSON.stringify(states));
             const responseJson = await response.json();
-            console.log('{{{{{{{{{{z api}}}}}}}}}}:', typeof responseJson, 'lenght:', responseJson.length);
-
+            // console.log('{{{{{{{{{{z api}}}}}}}}}}:', typeof responseJson, 'lenght:', responseJson.length);
             expect(Array.isArray(responseJson)).toEqual(true);
             expect(responseJson.length).toEqual(3);
             expect(responseJson[2].name).toEqual('Kenia');
@@ -131,7 +146,6 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
     test('- there are differences between new and old data', () => {
         arrWithNewPopulation = newTableWithStatesFromAPI.tableAfterComparison;
         newTableWithStatesFromAPI.infoAboutChangingPopulation(oldData1,newData);
-        
         // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
         expect(arrWithNewPopulation.length).toBe(1);
         expect(arrWithNewPopulation[0]).toBe('Angola');
@@ -140,7 +154,6 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
     test('- there are NOT differences between new and old data', () => {
         arrWithNewPopulation = newTableWithStatesFromAPI.tableAfterComparison;
         newTableWithStatesFromAPI.infoAboutChangingPopulation(oldData2,newData);
-        
         // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
         expect(arrWithNewPopulation.length).toBe(0);
         expect(arrWithNewPopulation[0]).toBe(undefined);
@@ -148,7 +161,7 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
 
 })
 
-// test for class StorageBrowser
+// tests for class StorageBrowser
 describe('Tests class StorageBrowser. Check,', () => {
     let keyObject = mockValues.obj.key;
     let resultObject = mockValues.obj.res;
@@ -199,6 +212,7 @@ describe('Tests class StorageBrowser. Check,', () => {
     });
 });
 
+// tests for app' start in different situation 
 describe('Scenario:', () => {
     beforeEach( async() => {
         newTableWithStatesFromAPI = new TableWithStates();
@@ -207,14 +221,7 @@ describe('Scenario:', () => {
         fromStorage = newStorage.getStorage('states');
         newTableWithStatesFromAPI.downloadFromAPI = () => mockValues.states1;
         fromAPI = newTableWithStatesFromAPI.downloadFromAPI();
-        
-        newTableWithStatesFromAPI.init = () => {
-            if(downloadFromApiAgain === 'storage' && newStorage.getStorage('states').length > 0) {
-                return fromStorage;
-            } else {
-                return fromAPI;
-            }
-        }
+        mockFunc()
     });
 
     afterEach(() => {
@@ -225,9 +232,11 @@ describe('Scenario:', () => {
     });
 
     test('1. simulate first start, local storage is empty (app have to use API)', () => {
-        newTableWithStatesFromAPI.init();
+        let init = newTableWithStatesFromAPI.init();
+        // console.log('=====init--scen1======',init);
+        // console.log('=====local--scen1======',newStorage.getStorage('states'));
         expect(fromStorage).toEqual(null);
-        expect(fromAPI.length).toEqual(3);
+        expect(init.length).toEqual(3);
     })
 })
 
@@ -240,14 +249,7 @@ describe('Next scenarios:', () => {
         fromStorage = newStorage.getStorage('states');
         newTableWithStatesFromAPI.downloadFromAPI = () => mockValues.states1;
         fromAPI = newTableWithStatesFromAPI.downloadFromAPI();
-
-        newTableWithStatesFromAPI.init = () => {
-            if(downloadFromApiAgain === 'storage' && newStorage.getStorage('states').length > 0) {
-                return fromStorage;
-            } else {
-                return fromAPI;
-            }
-        }
+        mockFunc()
     })
 
     afterEach( async() => {
@@ -257,22 +259,23 @@ describe('Next scenarios:', () => {
         fromStorage = null;
     })
 
-    test('2. simulate using API (there are states in local storage, but these are old data)', () => {
+    test('2. simulate start with using API (there are states in local storage, but these are old data)', () => {
         downloadFromApiAgain = 'api';
         let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--2======',init);
-        
+        // console.log('=====init--scen2======',init);
+        // console.log('=====local--scen2======',newStorage.getStorage('states'));
         expect(init.length).toEqual(3);
         expect(init[1].alpha3Code).toEqual('RWA');
     })
 
-    test('3. simulate using local storage ', () => {
+    test('3. simulate start with using local storage (there are states in local storage and these data are quite new)', () => {
         downloadFromApiAgain = 'storage';
         let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--2======',init);
-        
+        // console.log('=====init--scen3======',init);
+        // console.log('=====local--scen3======',newStorage.getStorage('states'));
         expect(init.length).toEqual(2);
         expect(init[0].alpha3Code).toEqual('MON');
+        expect(init[1].population).toEqual(49000);
     })
 })
 
