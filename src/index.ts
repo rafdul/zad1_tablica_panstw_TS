@@ -74,8 +74,8 @@ export class TableWithStates {
 
     url: string = "https://restcountries.com/v2/all";
     dateDownloadFromApi: number = 0;
+    tableStatesFromApi: Array<{}> = [];
     tableAfterComparison: Array<{}> = [];
-    // flagStorageOrApi: string = '';
 
     init(): void {
         if( this.downloadFromApiAgain( storage.getStorage('date') ) === 'storage' && storage.getStorage('states').length > 0 ) {
@@ -118,6 +118,7 @@ export class TableWithStates {
             .then(response => response.json())
             .then(data => {
                 console.log(logsTexts.tableWithStates.downloadFromAPI.success, data);
+                this.tableStatesFromApi = data;
 
                 if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
                     this.infoAboutChangingPopulation(storage.getStorage('states'), data);
@@ -156,8 +157,6 @@ export class TableWithStates {
             console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_IN_6DAYS + 'ms');
             return 'storage';
         }
-            
-        // return this.flagStorageOrApi = flag;
     }
 
     //  oblicza czas od ostaniego pobrania z API
@@ -195,6 +194,7 @@ export class TableWithStates {
 }
 
 let tableWithStates = new TableWithStates();
+// console.log('tableWithStates:', tableWithStates)
 
 // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
 export class StorageBrowser {
