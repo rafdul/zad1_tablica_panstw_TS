@@ -271,7 +271,7 @@ describe('Next scenarios:', () => {
     test('3. simulate start with using local storage (there are states in local storage and these data are quite new)', () => {
         downloadFromApiAgain = 'storage';
         let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--scen3======',init);
+        // console.log('=====init--scen3======',init );
         // console.log('=====local--scen3======',newStorage.getStorage('states'));
         expect(init.length).toEqual(2);
         expect(init[0].alpha3Code).toEqual('MON');
