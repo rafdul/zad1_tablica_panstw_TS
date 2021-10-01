@@ -37,12 +37,18 @@ interface Texts {
         downloadFromApiAgain: {useDataFromStorage: string, useDataFromApi: string},
         countTimeFromLastApi: {timeFromLastApi: string},
         infoAboutChangingPopulation: {stateWithChangedPopulation: string, noChangeOfPopulation: string},
+        getEuStates: {showTable: string},
     },
     storage: {
         saveStorage: {failure: string},
         getStorage: {failure: string},
     }
 };
+
+// interface TabWithStates {
+//     name: string,
+//     population: number,
+// };
 
 // zmienna zawierająca bibliotekę komunikatów w konsoli
 var logsTexts: Texts = {
@@ -66,6 +72,9 @@ var logsTexts: Texts = {
         infoAboutChangingPopulation: {
             stateWithChangedPopulation: 'Od ostatniego pobrania z API zmieniła się liczba ludności w krajach: ',
             noChangeOfPopulation: 'Od ostatniego pobrania z API nie zmieniła się liczba ludności w żadnym kraju.',
+        },
+        getEuStates: {
+            showTable: 'Państwa z UE: ',
         }
     },
     storage: {
@@ -84,11 +93,14 @@ export class TableWithStates {
     dateDownloadFromApi: number = 0;
     tableStatesFromApi: Array<{}> = [];
     tableAfterComparison: Array<{}> = [];
+    nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
+    tableOnlyStatesFromEU: Array<{}> = [];
 
     init(): void {
         if( this.downloadFromApiAgain( storage.getStorage('date') ) === 'storage' && storage.getStorage('states').length > 0 ) {
             console.log(logsTexts.tableWithStates.init.getFromStorage, storage.getStorage('states').length);
             console.log(logsTexts.tableWithStates.init.dataInStorage, storage.getStorage('states'));
+            this.getEuStates(storage.getStorage('states'));
         } else {
             console.log(logsTexts.tableWithStates.init.connectWithApi);
             this.downloadFromAPI();
@@ -137,6 +149,8 @@ export class TableWithStates {
                 storage.saveStorage('date', this.dateDownloadFromApi);
                 
                 storage.saveStorage('states', data);
+
+                this.getEuStates(data);
             })
             .catch(err => {
                 throw new Error(logsTexts.tableWithStates.downloadFromAPI.failure)
@@ -155,14 +169,14 @@ export class TableWithStates {
             this.countTimeFromLastApi(differenceInMs);
         };
         if(timeDownloadFromApi === null) {
-            differenceInMs = MS_IN_6DAYS;
+            differenceInMs = MS_FOR_TEST;
         };
 
-        if(differenceInMs >= MS_IN_6DAYS) {
+        if(differenceInMs >= MS_FOR_TEST) {
             console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromApi);
             return 'api';
         } else {
-            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_IN_6DAYS + 'ms');
+            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_FOR_TEST + 'ms');
             return 'storage';
         }
     }
@@ -199,10 +213,25 @@ export class TableWithStates {
             ? console.log(logsTexts.tableWithStates.infoAboutChangingPopulation.stateWithChangedPopulation, this.tableAfterComparison) 
             : console.log(logsTexts.tableWithStates.infoAboutChangingPopulation.noChangeOfPopulation);
     }
+
+    // generowanie tablicy TYLKO z danymi o państwach UE + wyeliminować ryzyko różnego zapisu nazwy kraju (małe / duże litery)
+    getEuStates(allStates: Array<{name: string}>): void {
+        const onlyStatesEU: Array<{}> = [];
+
+        allStates.forEach(item => {
+            this.nameStatesFromEU.find(el => {
+                if(el === (item.name.toLowerCase())) onlyStatesEU.push(item);
+            });
+        });
+
+        console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
+
+        const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
+    }
 }
 
-let tableWithStates = new TableWithStates();
-// console.log('tableWithStates:', tableWithStates)
+const tableWithStates = new TableWithStates();
+console.log('tableWithStates:', tableWithStates)
 
 // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
 export class StorageBrowser {
@@ -234,3 +263,18 @@ export class StorageBrowser {
 
 const storage = new StorageBrowser();
 
+// klasa państw z UE
+class TableWithStatesEU {
+    statesAll: Array<{}>;
+
+    constructor(statesAll: Array<{}>) {
+        this.statesAll = statesAll;
+    }
+
+    // usunąć państwa posiadające literę A lub a
+
+    // sortowanie wg populacji (od największej do najmniejszej)
+
+    // suma populacji 5 najgęściej zaludnionych państw i oblicz, czy jest większa od 500 milionów
+    
+}
