@@ -42,13 +42,16 @@ interface Texts {
     storage: {
         saveStorage: {failure: string},
         getStorage: {failure: string},
+    },
+    tableWithStatesEU: {
+        removeLetterA: {showTable: string},
     }
 };
 
-// interface TabWithStates {
-//     name: string,
-//     population: number,
-// };
+interface TabWithStates {
+    name: string,
+    population: number,
+};
 
 // zmienna zawierająca bibliotekę komunikatów w konsoli
 var logsTexts: Texts = {
@@ -75,7 +78,7 @@ var logsTexts: Texts = {
         },
         getEuStates: {
             showTable: 'Państwa z UE: ',
-        }
+        },
     },
     storage: {
         saveStorage: {
@@ -83,8 +86,13 @@ var logsTexts: Texts = {
         },
         getStorage: {
             failure: 'W localStorage nie ma danych pod kluczem ',
-        }
-    }
+        },
+    },
+    tableWithStatesEU: {
+        removeLetterA: {
+            showTable: 'Państwa z UE bez litery `a` w nazwie: ',
+        },
+    },
 }
 
 export class TableWithStates {
@@ -94,7 +102,7 @@ export class TableWithStates {
     tableStatesFromApi: Array<{}> = [];
     tableAfterComparison: Array<{}> = [];
     nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
-    tableOnlyStatesFromEU: Array<{}> = [];
+    // tableOnlyStatesFromEU: Array<{}> = [];
 
     init(): void {
         if( this.downloadFromApiAgain( storage.getStorage('date') ) === 'storage' && storage.getStorage('states').length > 0 ) {
@@ -215,8 +223,8 @@ export class TableWithStates {
     }
 
     // generowanie tablicy TYLKO z danymi o państwach UE + wyeliminować ryzyko różnego zapisu nazwy kraju (małe / duże litery)
-    getEuStates(allStates: Array<{name: string}>): void {
-        const onlyStatesEU: Array<{}> = [];
+    getEuStates(allStates: Array<TabWithStates>): void {
+        const onlyStatesEU: Array<TabWithStates> = [];
 
         allStates.forEach(item => {
             this.nameStatesFromEU.find(el => {
@@ -227,6 +235,8 @@ export class TableWithStates {
         console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
 
         const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
+        tableWithStatesEU.init();
+        // console.log('nowa instancja', tableWithStatesEU);
     }
 }
 
@@ -265,15 +275,49 @@ const storage = new StorageBrowser();
 
 // klasa państw z UE
 class TableWithStatesEU {
-    statesAll: Array<{}>;
+    states: Array<TabWithStates>;
+    tableStatesWithoutLetterA: Array<TabWithStates> = [];
+    tableStatesSortByPopulation: Array<TabWithStates> = [];
 
-    constructor(statesAll: Array<{}>) {
-        this.statesAll = statesAll;
+    constructor(states: Array<TabWithStates>) {
+        this.states = states;
+    }
+
+    init() {
+        this.removeLetterA();
     }
 
     // usunąć państwa posiadające literę A lub a
+    removeLetterA() {
+
+        this.states.forEach( item => {
+            if( !(item.name).toLowerCase().includes('a') ) this.tableStatesWithoutLetterA.push(item);
+        })
+
+        console.log(logsTexts.tableWithStatesEU.removeLetterA.showTable, this.tableStatesWithoutLetterA);
+
+        this.sortByPopulation();
+    }
 
     // sortowanie wg populacji (od największej do najmniejszej)
+    sortByPopulation() {
+        this.tableStatesSortByPopulation = Object.assign([], this.tableStatesWithoutLetterA)
+        function compare(a: TabWithStates, b: TabWithStates): number {
+            if (a.population > b.population) {
+                return -1;
+            }
+            if (a.population < b.population) {
+                return 1;
+            }
+            return 0
+        }
+
+        this.tableStatesSortByPopulation.sort(compare);
+        console.log('tableStatesSortByPopulation', this.tableStatesSortByPopulation);
+
+    }
+
+    // dodanie gęstości zaludnienia i posortowanie wg gęstości
 
     // suma populacji 5 najgęściej zaludnionych państw i oblicz, czy jest większa od 500 milionów
     
