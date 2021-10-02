@@ -51,6 +51,8 @@ interface Texts {
 interface TabWithStates {
     name: string,
     population: number,
+    area?: number,
+    density?: number,
 };
 
 // zmienna zawierająca bibliotekę komunikatów w konsoli
@@ -277,7 +279,7 @@ const storage = new StorageBrowser();
 class TableWithStatesEU {
     states: Array<TabWithStates>;
     tableStatesWithoutLetterA: Array<TabWithStates> = [];
-    tableStatesSortByPopulation: Array<TabWithStates> = [];
+    tableStatesSortByDensity: Array<TabWithStates> = [];
 
     constructor(states: Array<TabWithStates>) {
         this.states = states;
@@ -296,28 +298,35 @@ class TableWithStatesEU {
 
         console.log(logsTexts.tableWithStatesEU.removeLetterA.showTable, this.tableStatesWithoutLetterA);
 
-        this.sortByPopulation();
+        this.sortByDensity();
     }
 
     // sortowanie wg populacji (od największej do najmniejszej)
-    sortByPopulation() {
-        this.tableStatesSortByPopulation = Object.assign([], this.tableStatesWithoutLetterA)
+    sortByDensity() {
+        this.tableStatesSortByDensity = JSON.parse(JSON.stringify(this.tableStatesWithoutLetterA)) // klonowanie głębokie (nie ma referencji w obiektach zagłębionych, ale np. problem będzie z undefined)
+        
+        // dodanie właściwości gęstość zaludnienia do tablicy z danymi państw
+        this.tableStatesSortByDensity.forEach(item => {
+            if(item.population != undefined && item.area != undefined) item.density = parseFloat((item.population / item.area).toFixed(2));
+        });
+
         function compare(a: TabWithStates, b: TabWithStates): number {
-            if (a.population > b.population) {
-                return -1;
+            if(a.density != undefined && b.density != undefined) {
+                if (a.density > b.density) {
+                    return -1;
+                }
+                if (a.density < b.density) {
+                    return 1;
+                }
+                return 0;
             }
-            if (a.population < b.population) {
-                return 1;
-            }
-            return 0
+            return 0;
         }
 
-        this.tableStatesSortByPopulation.sort(compare);
-        console.log('tableStatesSortByPopulation', this.tableStatesSortByPopulation);
+        this.tableStatesSortByDensity.sort(compare);
+        console.log('tableStatesSortByPopulation', this.tableStatesSortByDensity);
 
     }
-
-    // dodanie gęstości zaludnienia i posortowanie wg gęstości
 
     // suma populacji 5 najgęściej zaludnionych państw i oblicz, czy jest większa od 500 milionów
     
