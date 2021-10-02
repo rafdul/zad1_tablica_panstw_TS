@@ -44,12 +44,15 @@ interface Texts {
         getStorage: {failure: string},
     },
     tableWithStatesEU: {
+        addDensityAndSort: {showTable: string},
         removeLetterA: {showTable: string},
+        sortByDensity: {showTable: string},
+        countPupulationTop5StatesEu: {info: string, moreThan: string, lessThan: string},
     }
 };
 
 interface TabWithStates {
-    name: string,
+    name: {common: string},
     population: number,
     area?: number,
     density?: number,
@@ -91,19 +94,30 @@ var logsTexts: Texts = {
         },
     },
     tableWithStatesEU: {
+        addDensityAndSort: {
+            showTable: 'Państwa UE posortowane wg gęstości',
+        },
         removeLetterA: {
-            showTable: 'Państwa z UE bez litery `a` w nazwie: ',
+            showTable: 'Państwa z UE bez litery `a` w nazwie (posortowane wg gęstości zaludnienia): ',
+        },
+        sortByDensity: {
+            showTable: '',
+        },
+        countPupulationTop5StatesEu: {
+            info: '5 najgęściej zaludnionych państw UE to:',
+            moreThan: 'Łączna liczba ludności w 5 najgęściej zaludnionych państwach UE jest większa od 500 mln i wynosi ',
+            lessThan: 'Łączna liczba ludności w 5 najgęściej zaludnionych państwach UE jest mniejsza od 500 mln i wynosi ',
         },
     },
 }
 
 export class TableWithStates {
 
-    url: string = "https://restcountries.com/v2/all";
+    url: string = "https://restcountries.com/v3.1/all";
     dateDownloadFromApi: number = 0;
     tableStatesFromApi: Array<{}> = [];
     tableAfterComparison: Array<{}> = [];
-    nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
+    nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
     // tableOnlyStatesFromEU: Array<{}> = [];
 
     init(): void {
@@ -205,7 +219,7 @@ export class TableWithStates {
 
     // porównanie populacji z dwóch zbiorów danych
     comparePopulationBetweenData(stateDataOld: any, stateDataNew:any) { 
-        if(stateDataOld.alpha3Code === stateDataNew.alpha3Code && 
+        if(stateDataOld.cca3 === stateDataNew.cca3 && 
             stateDataOld.population !== stateDataNew.population) {
             this.tableAfterComparison.push(stateDataOld.name);
             return ;
@@ -230,14 +244,14 @@ export class TableWithStates {
 
         allStates.forEach(item => {
             this.nameStatesFromEU.find(el => {
-                if(el === (item.name.toLowerCase())) onlyStatesEU.push(item);
+                if(el === (item.name.common.toLowerCase())) onlyStatesEU.push(item);
             });
         });
 
         console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
 
         const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
-        tableWithStatesEU.init();
+        tableWithStatesEU.addDensityAndSort();
         // console.log('nowa instancja', tableWithStatesEU);
     }
 }
@@ -278,6 +292,7 @@ const storage = new StorageBrowser();
 // klasa państw z UE
 class TableWithStatesEU {
     states: Array<TabWithStates>;
+    tableStatesWithDensity: Array<TabWithStates> = [];
     tableStatesWithoutLetterA: Array<TabWithStates> = [];
     tableStatesSortByDensity: Array<TabWithStates> = [];
 
@@ -285,30 +300,14 @@ class TableWithStatesEU {
         this.states = states;
     }
 
-    init() {
-        this.removeLetterA();
-    }
-
-    // usunąć państwa posiadające literę A lub a
-    removeLetterA() {
-
-        this.states.forEach( item => {
-            if( !(item.name).toLowerCase().includes('a') ) this.tableStatesWithoutLetterA.push(item);
-        })
-
-        console.log(logsTexts.tableWithStatesEU.removeLetterA.showTable, this.tableStatesWithoutLetterA);
-
-        this.sortByDensity();
-    }
-
-    // sortowanie wg populacji (od największej do najmniejszej)
-    sortByDensity() {
-        this.tableStatesSortByDensity = JSON.parse(JSON.stringify(this.tableStatesWithoutLetterA)) // klonowanie głębokie (nie ma referencji w obiektach zagłębionych, ale np. problem będzie z undefined)
+    // dodaj gęstość zaludnienia
+    addDensityAndSort() {
+        this.tableStatesWithDensity = JSON.parse(JSON.stringify(this.states)) // klonowanie głębokie (nie ma referencji w obiektach zagłębionych, ale np. problem będzie z undefined)
         
-        // dodanie właściwości gęstość zaludnienia do tablicy z danymi państw
-        this.tableStatesSortByDensity.forEach(item => {
+        this.tableStatesWithDensity.forEach(item => {
             if(item.population != undefined && item.area != undefined) item.density = parseFloat((item.population / item.area).toFixed(2));
         });
+        // console.log('tabela państw z gęstością zaludnienia:', this.tableStatesWithDensity);
 
         function compare(a: TabWithStates, b: TabWithStates): number {
             if(a.density != undefined && b.density != undefined) {
@@ -323,11 +322,40 @@ class TableWithStatesEU {
             return 0;
         }
 
-        this.tableStatesSortByDensity.sort(compare);
-        console.log('tableStatesSortByPopulation', this.tableStatesSortByDensity);
+        this.tableStatesWithDensity.sort(compare);
+        console.log(logsTexts.tableWithStatesEU.addDensityAndSort.showTable, this.tableStatesWithDensity)
 
+        this.removeLetterA();
+        this.countPupulationTop5StatesEu();
+    }
+
+    // usunąć państwa posiadające literę A lub a
+    removeLetterA() {
+        this.tableStatesWithDensity.forEach( item => {
+            if( !(item.name.common).toLowerCase().includes('a') ) this.tableStatesWithoutLetterA.push(item);
+        })
+
+        console.log(logsTexts.tableWithStatesEU.removeLetterA.showTable, this.tableStatesWithoutLetterA);
     }
 
     // suma populacji 5 najgęściej zaludnionych państw i oblicz, czy jest większa od 500 milionów
+    countPupulationTop5StatesEu() {
+        const top5ByDensity = this.tableStatesWithDensity.slice(0,5);
+        const nameTop5: string[] = [];
+        let sumOfPopulation: number = 0;
+
+        for(let i=0; i<top5ByDensity.length; i++) {
+            sumOfPopulation += top5ByDensity[i].population;
+            nameTop5.push(top5ByDensity[i].name.common);
+        }
+
+        console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.info, nameTop5.join(', '))
+
+        if(sumOfPopulation > 500000000) {
+            return console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.moreThan, sumOfPopulation.toString());
+        } else {
+            return console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.lessThan, sumOfPopulation.toString()); 
+        }
+    }
     
 }
