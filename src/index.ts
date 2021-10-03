@@ -113,11 +113,11 @@ var logsTexts: Texts = {
 
 export class TableWithStates {
 
-    url: string = "https://restcountries.com/v2/all";
-    dateDownloadFromApi: number = 0;
-    tableStatesFromApi: Array<{}> = [];
-    tableAfterComparison: Array<{}> = [];
-    nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
+    private url: string = "https://restcountries.com/v2/all";
+    private dateDownloadFromApi: number = 0;
+    private tableStatesFromApi: Array<{}> = [];
+    private tableAfterComparison: Array<{}> = [];
+    private nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
     // tableOnlyStatesFromEU: Array<{}> = [];
 
     init(): void {
@@ -252,12 +252,11 @@ export class TableWithStates {
 
         const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
         tableWithStatesEU.addDensityAndSort();
-        // console.log('nowa instancja', tableWithStatesEU);
     }
 }
 
 const tableWithStates = new TableWithStates();
-console.log('tableWithStates:', tableWithStates)
+// console.log('tableWithStates:', tableWithStates);
 
 // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
 export class StorageBrowser {
@@ -291,10 +290,10 @@ const storage = new StorageBrowser();
 
 // klasa państw z UE
 class TableWithStatesEU {
-    states: Array<TabWithStates>;
-    tableStatesWithDensity: Array<TabWithStates> = [];
-    tableStatesWithoutLetterA: Array<TabWithStates> = [];
-    tableStatesSortByDensity: Array<TabWithStates> = [];
+    private states: Array<TabWithStates>;
+    private tableStatesWithDensity: Array<TabWithStates> = [];
+    private tableStatesWithoutLetterA: Array<TabWithStates> = [];
+    private tableStatesSortByDensity: Array<TabWithStates> = [];
 
     constructor(states: Array<TabWithStates>) {
         this.states = states;
