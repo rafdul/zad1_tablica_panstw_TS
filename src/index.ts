@@ -52,7 +52,7 @@ interface Texts {
 };
 
 interface TabWithStates {
-    name: {common: string},
+    name: string,
     population: number,
     area?: number,
     density?: number,
@@ -113,7 +113,7 @@ var logsTexts: Texts = {
 
 export class TableWithStates {
 
-    url: string = "https://restcountries.com/v3.1/all";
+    url: string = "https://restcountries.com/v2/all";
     dateDownloadFromApi: number = 0;
     tableStatesFromApi: Array<{}> = [];
     tableAfterComparison: Array<{}> = [];
@@ -219,7 +219,7 @@ export class TableWithStates {
 
     // porównanie populacji z dwóch zbiorów danych
     comparePopulationBetweenData(stateDataOld: any, stateDataNew:any) { 
-        if(stateDataOld.cca3 === stateDataNew.cca3 && 
+        if(stateDataOld.alpha3Code === stateDataNew.alpha3Code && 
             stateDataOld.population !== stateDataNew.population) {
             this.tableAfterComparison.push(stateDataOld.name);
             return ;
@@ -244,7 +244,7 @@ export class TableWithStates {
 
         allStates.forEach(item => {
             this.nameStatesFromEU.find(el => {
-                if(el === (item.name.common.toLowerCase())) onlyStatesEU.push(item);
+                if(el === (item.name.toLowerCase())) onlyStatesEU.push(item);
             });
         });
 
@@ -332,7 +332,7 @@ class TableWithStatesEU {
     // usunąć państwa posiadające literę A lub a
     removeLetterA() {
         this.tableStatesWithDensity.forEach( item => {
-            if( !(item.name.common).toLowerCase().includes('a') ) this.tableStatesWithoutLetterA.push(item);
+            if( !(item.name).toLowerCase().includes('a') ) this.tableStatesWithoutLetterA.push(item);
         })
 
         console.log(logsTexts.tableWithStatesEU.removeLetterA.showTable, this.tableStatesWithoutLetterA);
@@ -346,7 +346,7 @@ class TableWithStatesEU {
 
         for(let i=0; i<top5ByDensity.length; i++) {
             sumOfPopulation += top5ByDensity[i].population;
-            nameTop5.push(top5ByDensity[i].name.common);
+            nameTop5.push(top5ByDensity[i].name);
         }
 
         console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.info, nameTop5.join(', '))
