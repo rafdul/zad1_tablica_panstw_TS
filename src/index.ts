@@ -239,7 +239,7 @@ export class TableWithStates {
     }
 
     // generowanie tablicy TYLKO z danymi o państwach UE + wyeliminować ryzyko różnego zapisu nazwy kraju (małe / duże litery)
-    getEuStates(allStates: Array<TabWithStates>): void {
+    getEuStates(allStates: Array<TabWithStates>): Array<TabWithStates> {
         const onlyStatesEU: Array<TabWithStates> = [];
 
         allStates.forEach(item => {
@@ -252,6 +252,7 @@ export class TableWithStates {
 
         const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
         tableWithStatesEU.init();
+        return onlyStatesEU;
     }
 }
 

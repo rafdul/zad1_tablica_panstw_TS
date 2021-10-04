@@ -172,6 +172,28 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
 
 })
 
+describe('Tests class TableWithStates. Check, ', () => {
+    beforeEach(() => {
+        newTableWithStatesFromAPI = new TableWithStates();
+    });
+
+    afterEach(() => {
+        newTableWithStatesFromAPI = null;
+    });
+
+    test('if app can select only EU countries:', () => {
+        const onlyEU = newTableWithStatesFromAPI.getEuStates(mockValues.states4);
+        tableWithStatesEU = new TableWithStatesEU(onlyEU);
+        // console.log('///////po selekcji, tylko UE:////////', onlyEU);
+        // console.log('///////państwa przekazane do nowej instancji:////////', tableWithStatesEU.states);
+
+        expect(onlyEU.length).toEqual(4);
+        expect(onlyEU[1].name).toEqual('Poland');
+        expect(onlyEU[1].name).toEqual(tableWithStatesEU.states[1].name);
+    })
+})
+
+
 // tests for class StorageBrowser
 describe('Tests class StorageBrowser. Check,', () => {
     let keyObject = mockValues.obj.key;
@@ -304,6 +326,6 @@ describe('Tests class TableWithStatesEU. Check,', () => {
 
     test('if new object is created as instance of TableWithStatesEU ', () => {
         expect(tableWithStatesEU).toBeInstanceOf(TableWithStatesEU);
-        console.log(tableWithStatesEU)
+        // console.log(tableWithStatesEU)
     });
 })
