@@ -184,7 +184,7 @@ export class TableWithStates {
     // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
     downloadFromApiAgain(timeDownloadFromApi: number | null): string {
         const MS_IN_6DAYS: number = 6*24*60*60*1000;
-        const MS_FOR_TEST: number = 30*1000;
+        // const MS_IN_6DAYS: number = 30*1000; // wartość do testów
         const timeNow: number = (new Date).getTime();
         let differenceInMs: number = 0;
 
@@ -193,14 +193,14 @@ export class TableWithStates {
             this.countTimeFromLastApi(differenceInMs);
         };
         if(timeDownloadFromApi === null) {
-            differenceInMs = MS_FOR_TEST;
+            differenceInMs = MS_IN_6DAYS;
         };
 
-        if(differenceInMs >= MS_FOR_TEST) {
+        if(differenceInMs >= MS_IN_6DAYS) {
             console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromApi);
             return 'api';
         } else {
-            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_FOR_TEST + 'ms');
+            console.log(logsTexts.tableWithStates.downloadFromApiAgain.useDataFromStorage, MS_IN_6DAYS + 'ms');
             return 'storage';
         }
     }
@@ -251,7 +251,7 @@ export class TableWithStates {
         console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
 
         const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
-        tableWithStatesEU.addDensityAndSort();
+        tableWithStatesEU.init();
     }
 }
 
@@ -289,7 +289,7 @@ export class StorageBrowser {
 const storage = new StorageBrowser();
 
 // klasa państw z UE
-class TableWithStatesEU {
+export class TableWithStatesEU {
     private states: Array<TabWithStates>;
     private tableStatesWithDensity: Array<TabWithStates> = [];
     private tableStatesWithoutLetterA: Array<TabWithStates> = [];
@@ -297,6 +297,10 @@ class TableWithStatesEU {
 
     constructor(states: Array<TabWithStates>) {
         this.states = states;
+    }
+
+    init() {
+        this.addDensityAndSort();
     }
 
     // dodaj gęstość zaludnienia

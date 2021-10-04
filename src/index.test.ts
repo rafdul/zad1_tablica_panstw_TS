@@ -1,4 +1,4 @@
-import { TableWithStates, StorageBrowser } from './index';
+import { TableWithStates, StorageBrowser, TableWithStatesEU } from './index';
 
 let newTableWithStatesFromAPI: any = null;
 let newStorage: any = null;
@@ -6,14 +6,24 @@ let fromStorage: any = null;
 let fromAPI: any = null;
 let downloadFromApiAgain: string = '';
 const MS_IN_6DAYS: number = 6*24*60*60*1000;
-// const MS_FOR_TEST: number = 30*1000;
+// const MS_IN_6DAYS: number = 30*1000;
 const timeNow: number = (new Date).getTime();
 
+interface TabWithStates {
+    name: string,
+    population: number,
+    area?: number,
+    density?: number,
+    id?: number,
+    alpha3Code?: string,
+};
+
 interface Values {
-    states0: Array<{}>,
-    states1: Array<{}>,
-    states2: Array<{}>,
-    states3: Array<{}>,
+    states0: Array<TabWithStates>,
+    states1: Array<TabWithStates>,
+    states2: Array<TabWithStates>,
+    states3: Array<TabWithStates>,
+    states4: Array<TabWithStates>
     obj: {key: string, res: {}[]},
     arr: {key: string, res: string[]},
     num: {key: string, res: number},
@@ -33,16 +43,17 @@ const mockValues: Values = {
     states1: [{id: 1, alpha3Code: 'BEN', name: 'Benin', population: 1000000}, {id: 2, alpha3Code: 'RWA', name: 'Rwanda', population: 5500000}, {id: 3, alpha3Code: 'UGA', name: 'Uganda', population: 70000000}],
     states2: [{id: 1, alpha3Code: 'MON', name: 'Monaco', population: 800000}, {id: 2, alpha3Code: 'SAN', name: 'San Marino', population: 49000},],
     states3: [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 9000000}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000}],
+    states4: [{name: 'Burkina', population: 9000000, area: 67540}, {name: 'Surinam', population: 880000, area: 6754}, {name: 'Malta', population: 213000, area: 645}, {name: 'Poland', population: 33000000, area: 450000}, {name: 'Greece', population: 8000000, area: 187000}, {name: 'Belgium', population: 11000000, area: 120000}],
     obj: {key: 'testObject', res: [{name: 'lorem', surname: 'ipsum', id: 1}, {name: 'adam', surname: 'mickiewicz', id: 2}]},
     arr: {key: 'testArray', res: ['miłosz', 'szymborska', 'sienkiewicz', 'wyspiański', 'tokarczuk']},
     num: {key: 'testNumber', res: 12345},
     empty: {key: 'testEmpty', res: null},
     time: {
-        number6Days: timeNow - MS_IN_6DAYS, 
-        numberGreaterThan6Days: timeNow - MS_IN_6DAYS - 1, 
-        numberLess6Days: timeNow - 1, 
-        numberLess6Days2: timeNow - MS_IN_6DAYS + 1000, 
-        numberLess6Days3: timeNow - 1000, 
+        number6Days: (timeNow - MS_IN_6DAYS), 
+        numberGreaterThan6Days: (timeNow - MS_IN_6DAYS - 1), 
+        numberLess6Days: (timeNow - 1), 
+        numberLess6Days2: (timeNow - MS_IN_6DAYS + 1000), 
+        numberLess6Days3: (timeNow - 1000), 
         notNumber: null,
     },
 }
@@ -75,7 +86,7 @@ describe('Tests class TableWithStates. Check,', () => {
         global.fetch = unmockedFetch;
     });
     
-    test('if new object is created as instance of TableWithStates', () => {
+    test('if new object is created as instance of TableWithStates ', () => {
         expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
     });
 
@@ -115,14 +126,14 @@ describe('Tests class TableWithStates. Check, if app use local storage or API ag
 
     test('- app should choose API', () => {
         for(let i=0; i<arrApi.length; i++) {
-            // console.log('+++storage+++', arrApi[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i]))
+            console.log('====api===', arrApi[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i]))
             expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i])).toBe('api')
         }
     })
 
     test('- app should choose local storage', () => {
         for(let i=0; i<arrStorage.length; i++) {
-            // console.log('====storage===', arrStorage[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i]))
+            console.log('====storage===', arrStorage[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i]))
             expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i])).toBe('storage')
         }
     })
@@ -252,7 +263,7 @@ describe('Next scenarios:', () => {
         mockFunc()
     })
 
-    afterEach( async() => {
+    afterEach( () => {
         newTableWithStatesFromAPI = null;
         newStorage = null;
         fromAPI = null;
@@ -279,3 +290,20 @@ describe('Next scenarios:', () => {
     })
 })
 
+// tests for class TableWithStatesEU
+let tableWithStatesEU: any = null;
+ 
+describe('Tests class TableWithStatesEU. Check,', () => {
+    beforeEach(() => {
+        tableWithStatesEU = new TableWithStatesEU(mockValues.states4);
+    })
+
+    afterEach(() => {
+        tableWithStatesEU = null;
+    })
+
+    test('if new object is created as instance of TableWithStatesEU ', () => {
+        expect(tableWithStatesEU).toBeInstanceOf(TableWithStatesEU);
+        console.log(tableWithStatesEU)
+    });
+})
