@@ -1,72 +1,8 @@
 import { TableWithStates, StorageBrowser, TableWithStatesEU } from './index';
+import { mockValues } from './mocks'
 
 let newTableWithStatesFromAPI: any = null;
 let newStorage: any = null;
-let fromStorage: any = null;
-let fromAPI: any = null;
-let downloadFromApiAgain: string = '';
-const MS_IN_6DAYS: number = 6*24*60*60*1000;
-// const MS_IN_6DAYS: number = 30*1000;
-const timeNow: number = (new Date).getTime();
-
-interface TabWithStates {
-    name: string,
-    population: number,
-    area?: number,
-    density?: number,
-    id?: number,
-    alpha3Code?: string,
-};
-
-interface Values {
-    states0: Array<TabWithStates>,
-    states1: Array<TabWithStates>,
-    states2: Array<TabWithStates>,
-    states3: Array<TabWithStates>,
-    states4: Array<TabWithStates>
-    obj: {key: string, res: {}[]},
-    arr: {key: string, res: string[]},
-    num: {key: string, res: number},
-    empty: {key: string, res: null},
-    time: {
-        number6Days: number, 
-        numberGreaterThan6Days: number, 
-        numberLess6Days: number, 
-        numberLess6Days2: number, 
-        numberLess6Days3: number, 
-        notNumber: null,
-    },
-}
-
-const mockValues: Values = {
-    states0: [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 10000000}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000}],
-    states1: [{id: 1, alpha3Code: 'BEN', name: 'Benin', population: 1000000}, {id: 2, alpha3Code: 'RWA', name: 'Rwanda', population: 5500000}, {id: 3, alpha3Code: 'UGA', name: 'Uganda', population: 70000000}],
-    states2: [{id: 1, alpha3Code: 'MON', name: 'Monaco', population: 800000}, {id: 2, alpha3Code: 'SAN', name: 'San Marino', population: 49000},],
-    states3: [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 9000000}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000}],
-    states4: [{name: 'Burkina', population: 9000000, area: 67540}, {name: 'Surinam', population: 880000, area: 6754}, {name: 'Malta', population: 213000, area: 645}, {name: 'Poland', population: 33000000, area: 450000}, {name: 'Greece', population: 8000000, area: 187000}, {name: 'Belgium', population: 11000000, area: 120000}],
-    obj: {key: 'testObject', res: [{name: 'lorem', surname: 'ipsum', id: 1}, {name: 'adam', surname: 'mickiewicz', id: 2}]},
-    arr: {key: 'testArray', res: ['miłosz', 'szymborska', 'sienkiewicz', 'wyspiański', 'tokarczuk']},
-    num: {key: 'testNumber', res: 12345},
-    empty: {key: 'testEmpty', res: null},
-    time: {
-        number6Days: (timeNow - MS_IN_6DAYS), 
-        numberGreaterThan6Days: (timeNow - MS_IN_6DAYS - 1), 
-        numberLess6Days: (timeNow - 1), 
-        numberLess6Days2: (timeNow - MS_IN_6DAYS + 1000), 
-        numberLess6Days3: (timeNow - 1000), 
-        notNumber: null,
-    },
-}
-
-function mockFunc(): void {
-    newTableWithStatesFromAPI.init = (): void => {
-        if(downloadFromApiAgain === 'storage' && newStorage.getStorage('states').length > 0) {
-            return fromStorage;
-        } else {
-            return fromAPI;
-        }
-    }
-}
 
 // tests for class TableWithStates
 describe('Tests class TableWithStates. Check,', () => {
@@ -184,12 +120,12 @@ describe('Tests class TableWithStates. Check, ', () => {
     test('if app can select only EU countries:', () => {
         const onlyEU = newTableWithStatesFromAPI.getEuStates(mockValues.states4);
         tableWithStatesEU = new TableWithStatesEU(onlyEU);
-        // console.log('///////po selekcji, tylko UE:////////', onlyEU);
-        // console.log('///////państwa przekazane do nowej instancji:////////', tableWithStatesEU.states);
+        // console.log('====po selekcji, tylko UE:', onlyEU);
+        // console.log('====państwa przekazane do nowej instancji:', tableWithStatesEU.states);
 
         expect(onlyEU.length).toEqual(4);
         expect(onlyEU[1].name).toEqual('Poland');
-        expect(onlyEU[1].name).toEqual(tableWithStatesEU.states[1].name);
+        expect(onlyEU[1].name).toEqual(tableWithStatesEU.states[1].name);        
     })
 })
 
@@ -244,73 +180,6 @@ describe('Tests class StorageBrowser. Check,', () => {
         expect(testArrayFromStorage).not.toContain('herbert');
     });
 });
-
-// tests for app' start in different situation 
-describe('Scenario:', () => {
-    beforeEach( async() => {
-        newTableWithStatesFromAPI = new TableWithStates();
-        newStorage = new StorageBrowser();
-
-        fromStorage = newStorage.getStorage('states');
-        newTableWithStatesFromAPI.downloadFromAPI = () => mockValues.states1;
-        fromAPI = newTableWithStatesFromAPI.downloadFromAPI();
-        mockFunc()
-    });
-
-    afterEach(() => {
-        newTableWithStatesFromAPI = null;
-        newStorage = null;
-        fromAPI = null;
-        fromStorage = null;
-    });
-
-    test('1. simulate first start, local storage is empty (app have to use API)', () => {
-        let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--scen1======',init);
-        // console.log('=====local--scen1======',newStorage.getStorage('states'));
-        expect(fromStorage).toEqual(null);
-        expect(init.length).toEqual(3);
-    })
-})
-
-describe('Next scenarios:', () => {
-    beforeEach( async() => {
-        newTableWithStatesFromAPI = new TableWithStates();
-        newStorage = new StorageBrowser();
-
-        newStorage.saveStorage('states', mockValues.states2);
-        fromStorage = newStorage.getStorage('states');
-        newTableWithStatesFromAPI.downloadFromAPI = () => mockValues.states1;
-        fromAPI = newTableWithStatesFromAPI.downloadFromAPI();
-        mockFunc()
-    })
-
-    afterEach( () => {
-        newTableWithStatesFromAPI = null;
-        newStorage = null;
-        fromAPI = null;
-        fromStorage = null;
-    })
-
-    test('2. simulate start with using API (there are states in local storage, but these are old data)', () => {
-        downloadFromApiAgain = 'api';
-        let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--scen2======',init);
-        // console.log('=====local--scen2======',newStorage.getStorage('states'));
-        expect(init.length).toEqual(3);
-        expect(init[1].alpha3Code).toEqual('RWA');
-    })
-
-    test('3. simulate start with using local storage (there are states in local storage and these data are quite new)', () => {
-        downloadFromApiAgain = 'storage';
-        let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--scen3======',init );
-        // console.log('=====local--scen3======',newStorage.getStorage('states'));
-        expect(init.length).toEqual(2);
-        expect(init[0].alpha3Code).toEqual('MON');
-        expect(init[1].population).toEqual(49000);
-    })
-})
 
 // tests for class TableWithStatesEU
 let tableWithStatesEU: any = null;

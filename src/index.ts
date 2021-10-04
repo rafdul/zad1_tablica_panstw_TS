@@ -56,6 +56,7 @@ interface TabWithStates {
     population: number,
     area?: number,
     density?: number,
+    regionalBlocs: Array<{acronym: string}>
 };
 
 // zmienna zawierająca bibliotekę komunikatów w konsoli
@@ -117,7 +118,7 @@ export class TableWithStates {
     private dateDownloadFromApi: number = 0;
     private tableStatesFromApi: Array<{}> = [];
     private tableAfterComparison: Array<{}> = [];
-    private nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
+    // private nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden'];
     // tableOnlyStatesFromEU: Array<{}> = [];
 
     init(): void {
@@ -239,11 +240,22 @@ export class TableWithStates {
     }
 
     // generowanie tablicy TYLKO z danymi o państwach UE + wyeliminować ryzyko różnego zapisu nazwy kraju (małe / duże litery)
-    getEuStates(allStates: Array<TabWithStates>): Array<TabWithStates> {
+    getEuStates(allStates: Array<TabWithStates>):Array<TabWithStates> {
+        const nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
         const onlyStatesEU: Array<TabWithStates> = [];
 
+        // metoda z wykorzystaniem klucza "regionalBloc", która zwraca wśród członków UE kilka terytoriów zależnych (np. Gujana Fr, Gibraltar)
+        // allStates.forEach(item => {
+        //     if(item.regionalBlocs) {
+        //         for(let i = 0; i < item.regionalBlocs.length; i++) {
+        //             if(item.regionalBlocs[i].acronym === 'EU') onlyStatesEU.push(item);
+        //         }
+        //     }
+        // });
+
+        // metoda korzystająca ze słownika zawierającego faktycznych członków UE
         allStates.forEach(item => {
-            this.nameStatesFromEU.find(el => {
+            nameStatesFromEU.find(el => {
                 if(el === (item.name.toLowerCase())) onlyStatesEU.push(item);
             });
         });
@@ -252,6 +264,7 @@ export class TableWithStates {
 
         const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
         tableWithStatesEU.init();
+        
         return onlyStatesEU;
     }
 }
@@ -294,7 +307,6 @@ export class TableWithStatesEU {
     private states: Array<TabWithStates>;
     private tableStatesWithDensity: Array<TabWithStates> = [];
     private tableStatesWithoutLetterA: Array<TabWithStates> = [];
-    private tableStatesSortByDensity: Array<TabWithStates> = [];
 
     constructor(states: Array<TabWithStates>) {
         this.states = states;
@@ -309,7 +321,9 @@ export class TableWithStatesEU {
         this.tableStatesWithDensity = JSON.parse(JSON.stringify(this.states)) // klonowanie głębokie (nie ma referencji w obiektach zagłębionych, ale np. problem będzie z undefined)
         
         this.tableStatesWithDensity.forEach(item => {
-            if(item.population != undefined && item.area != undefined) item.density = parseFloat((item.population / item.area).toFixed(2));
+            if(item.population != undefined && item.area != undefined) {
+                item.density = parseFloat((item.population / item.area).toFixed(2));
+            }
         });
         // console.log('tabela państw z gęstością zaludnienia:', this.tableStatesWithDensity);
 
