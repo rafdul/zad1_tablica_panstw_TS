@@ -12,10 +12,10 @@ interface Texts {
         getStorage: {failure: string},
     },
     tableWithStatesEU: {
-        addDensityAndSort: {showTable: string},
+        compareStates: {showTable: string},
         removeLetterA: {showTable: string},
         sortByDensity: {showTable: string},
-        countPupulationTop5StatesEu: {info: string, moreThan: string, lessThan: string},
+        countPopulationForAFewStatesEu: {info: string, moreThan: string, lessThan: string},
     }
 };
 
@@ -63,7 +63,7 @@ export var logsTexts: Texts = {
         },
     },
     tableWithStatesEU: {
-        addDensityAndSort: {
+        compareStates: {
             showTable: 'Państwa UE posortowane wg gęstości',
         },
         removeLetterA: {
@@ -72,8 +72,8 @@ export var logsTexts: Texts = {
         sortByDensity: {
             showTable: '',
         },
-        countPupulationTop5StatesEu: {
-            info: 'Pięć najgęściej zaludnionych państw UE to:',
+        countPopulationForAFewStatesEu: {
+            info: ' najgęściej zaludnionych państw UE to: ',
             moreThan: 'Łączna liczba ludności w 5 najgęściej zaludnionych państwach UE jest większa od 500 mln i wynosi ',
             lessThan: 'Łączna liczba ludności w 5 najgęściej zaludnionych państwach UE jest mniejsza od 500 mln i wynosi ',
         },

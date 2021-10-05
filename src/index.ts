@@ -36,8 +36,6 @@ export class TableWithStates {
     private dateDownloadFromApi: number = 0;
     private tableStatesFromApi: Array<{}> = [];
     private tableAfterComparison: Array<{}> = [];
-    // private nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden'];
-    // tableOnlyStatesFromEU: Array<{}> = [];
 
     init(): void {
         if( this.downloadFromApiAgain( storage.getStorage('date') ) === 'storage' && storage.getStorage('states').length > 0 ) {
@@ -49,32 +47,6 @@ export class TableWithStates {
             this.downloadFromAPI();
         }
     }
-
-    // pobranie danych z API; zapisanie w local storage pobranych danych i timestamp pobrania (wersja async / await)
-    // downloadFromAPI = async() => { 
-    //     try {
-    //         const response: Response = await fetch(this.url);
-    //         console.log('response typ:', typeof response, ' zawartość: ', response);
-    //         const responseJson: any = await response.json();
-    //         console.log('responseJson typ:', typeof responseJson, ', czy tablica?', Array.isArray(responseJson), ' zawartość: ', responseJson);
-
-    //         console.log(logsTexts.tableWithStates.downloadFromAPI.success, responseJson);
-
-    //         if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
-    //             this.infoAboutChangingPopulation(storage.getStorage('states'), responseJson);
-    //         }
-
-    //         let time: any = new Date();
-    //         this.dateDownloadFromApi = time.getTime();
-    //         storage.saveStorage('date', this.dateDownloadFromApi);
-
-    //         storage.saveStorage('states', responseJson);
-    //     }
-    //     catch(err) {
-    //         throw new Error(logsTexts.tableWithStates.downloadFromAPI.failure)
-    //         // console.log(logsTexts.tableWithStates.downloadFromAPI.b, ' | ',err)
-    //     }
-    // }
 
     downloadFromAPI(): void { 
         fetch(this.url)
@@ -174,7 +146,7 @@ export class TableWithStates {
         // metoda korzystająca ze słownika zawierającego faktycznych członków UE
         onlyStatesEU = allStates.filter(el => nameStatesFromEU.includes(el.name.toLowerCase()));
 
-        console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
+        // console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
 
         const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
         tableWithStatesEU.init();
@@ -237,47 +209,55 @@ export class TableWithStatesEU {
             }
         });
 
-        function compare(a: TabWithStates, b: TabWithStates): number {
-            if(a.density != undefined && b.density != undefined) {
-                if (a.density > b.density) {
+        this.compareStates(this.states, 'density')
+        this.removeLetterA(this.states, 'a');
+        this.countPopulationForAFewStatesEu(this.states, 5);
+    }
+
+    // sortowanie państw wg jakiegoś kryterium (keyBySort)
+    compareStates(tableWithStates:Array<TabWithStates>, keyBySort:string):Array<TabWithStates> {
+        function compare(a:any, b:any): number  {
+            if(typeof a[keyBySort] === 'number' && typeof b[keyBySort] === 'number') {
+                if (a[keyBySort] > b[keyBySort]) {
                     return -1;
                 }
-                if (a.density < b.density) {
+                if (a[keyBySort] < b[keyBySort]) {
                     return 1;
                 }
                 return 0;
             }
             return 0;
         }
-        this.states.sort(compare)
-        
-        console.log(logsTexts.tableWithStatesEU.addDensityAndSort.showTable, this.states)
 
-        this.removeLetterA();
-        this.countPupulationTop5StatesEu();
+        tableWithStates.sort(compare)
+        console.log(logsTexts.tableWithStatesEU.compareStates.showTable, tableWithStates)
+        return tableWithStates;
     }
 
     // usunąć państwa posiadające literę A lub a
-    removeLetterA() {
-        this.states.forEach( item => {
-            if( !(item.name).toLowerCase().includes('a') ) this.tableStatesWithoutLetterA.push(item);
+    removeLetterA(tableWithStates: Array<TabWithStates>, letter: string): Array<TabWithStates> {
+        tableWithStates.forEach( item => {
+            if( !(item.name).toLowerCase().includes(letter) ) this.tableStatesWithoutLetterA.push(item);
         })
 
         console.log(logsTexts.tableWithStatesEU.removeLetterA.showTable, this.tableStatesWithoutLetterA);
+        return this.tableStatesWithoutLetterA;
     }
 
     // suma populacji 5 najgęściej zaludnionych państw i oblicz, czy jest większa od 500 milionów
-    countPupulationTop5StatesEu() {
-        const top5ByDensity = this.states.slice(0,5);
-        const nameTop5: string[] = top5ByDensity.map(el => el.name);
-        const sumOfPopulation: number = top5ByDensity.reduce( (a,b) => a + b.population, 0)
+    countPopulationForAFewStatesEu(tableWithStates:Array<TabWithStates>, amountStates: number): number {
+        const onlyTopStates = tableWithStates.slice(0,amountStates);
+        const nameTopStates: string[] = onlyTopStates.map(el => el.name);
+        const sumOfPopulation: number = onlyTopStates.reduce( (a,b) => a + b.population, 0)
 
-        console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.info, nameTop5.join(', '))
+        console.log(amountStates + logsTexts.tableWithStatesEU.countPopulationForAFewStatesEu.info + nameTopStates.join(', '))
 
         if(sumOfPopulation > 500000000) {
-            return console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.moreThan, sumOfPopulation.toString());
+            console.log(logsTexts.tableWithStatesEU.countPopulationForAFewStatesEu.moreThan, sumOfPopulation.toString());
         } else {
-            return console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.lessThan, sumOfPopulation.toString()); 
+            console.log(logsTexts.tableWithStatesEU.countPopulationForAFewStatesEu.lessThan, sumOfPopulation.toString()); 
         }
+
+        return sumOfPopulation;
     }
 }
