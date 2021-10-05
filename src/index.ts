@@ -20,96 +20,14 @@
  * Kod może posiadać komentarze.
 **/
 
+import { TabWithStates, logsTexts } from './textsAndInterfaces'
+
 
 
 window.onload = function() {
     console.log('App started!');
 
     tableWithStates.init();
-}
-
-
-// interfejsy zmiennych
-interface Texts {
-    tableWithStates: {
-        init: {getFromStorage: string, dataInStorage: string, connectWithApi: string},
-        downloadFromAPI: {success: string, failure: string},
-        downloadFromApiAgain: {useDataFromStorage: string, useDataFromApi: string},
-        countTimeFromLastApi: {timeFromLastApi: string},
-        infoAboutChangingPopulation: {stateWithChangedPopulation: string, noChangeOfPopulation: string},
-        getEuStates: {showTable: string},
-    },
-    storage: {
-        saveStorage: {failure: string},
-        getStorage: {failure: string},
-    },
-    tableWithStatesEU: {
-        addDensityAndSort: {showTable: string},
-        removeLetterA: {showTable: string},
-        sortByDensity: {showTable: string},
-        countPupulationTop5StatesEu: {info: string, moreThan: string, lessThan: string},
-    }
-};
-
-interface TabWithStates {
-    name: string,
-    population: number,
-    area?: number,
-    density?: number,
-    regionalBlocs: Array<{acronym: string}>
-};
-
-// zmienna zawierająca bibliotekę komunikatów w konsoli
-var logsTexts: Texts = {
-    tableWithStates: {
-        init: {
-            getFromStorage: 'Pobrałem dane zapisane w localStorage. Liczba państw w localStorage to: ',
-            dataInStorage: 'Dane państw zapisane w localStorage: ',
-            connectWithApi: 'Łączę się z API',
-        },
-        downloadFromAPI: {
-            success: 'Dane państw pobrane z API:',
-            failure: 'Brak łączności z API',
-        },
-        downloadFromApiAgain: {
-            useDataFromStorage: 'Korzystam z localstorage i nie pobieram nowych danych z API. Od ostatniego pobrania z API upłynęło mniej niż ',
-            useDataFromApi: 'Od ostatniego pobrania z API upłynęło więcej niż 6 dni, więc ponownie pobieram dane z API.',
-        },
-        countTimeFromLastApi: {
-            timeFromLastApi: 'Od ostatniego pobrania z API minęło: ',
-        },
-        infoAboutChangingPopulation: {
-            stateWithChangedPopulation: 'Od ostatniego pobrania z API zmieniła się liczba ludności w krajach: ',
-            noChangeOfPopulation: 'Od ostatniego pobrania z API nie zmieniła się liczba ludności w żadnym kraju.',
-        },
-        getEuStates: {
-            showTable: 'Państwa z UE: ',
-        },
-    },
-    storage: {
-        saveStorage: {
-            failure: 'Błąd zapisu w localStorage (brak przekazanych danych)',
-        },
-        getStorage: {
-            failure: 'W localStorage nie ma danych pod kluczem ',
-        },
-    },
-    tableWithStatesEU: {
-        addDensityAndSort: {
-            showTable: 'Państwa UE posortowane wg gęstości',
-        },
-        removeLetterA: {
-            showTable: 'Państwa z UE bez litery `a` w nazwie (posortowane wg gęstości zaludnienia): ',
-        },
-        sortByDensity: {
-            showTable: '',
-        },
-        countPupulationTop5StatesEu: {
-            info: '5 najgęściej zaludnionych państw UE to:',
-            moreThan: 'Łączna liczba ludności w 5 najgęściej zaludnionych państwach UE jest większa od 500 mln i wynosi ',
-            lessThan: 'Łączna liczba ludności w 5 najgęściej zaludnionych państwach UE jest mniejsza od 500 mln i wynosi ',
-        },
-    },
 }
 
 export class TableWithStates {
@@ -184,8 +102,8 @@ export class TableWithStates {
 
     // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
     downloadFromApiAgain(timeDownloadFromApi: number | null): string {
-        const MS_IN_6DAYS: number = 6*24*60*60*1000;
-        // const MS_IN_6DAYS: number = 30*1000; // wartość do testów
+        // const MS_IN_6DAYS: number = 6*24*60*60*1000;
+        const MS_IN_6DAYS: number = 30*1000; // wartość do testów
         const timeNow: number = (new Date).getTime();
         let differenceInMs: number = 0;
 
@@ -242,7 +160,7 @@ export class TableWithStates {
     // generowanie tablicy TYLKO z danymi o państwach UE + wyeliminować ryzyko różnego zapisu nazwy kraju (małe / duże litery)
     getEuStates(allStates: Array<TabWithStates>):Array<TabWithStates> {
         const nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
-        const onlyStatesEU: Array<TabWithStates> = [];
+        let  onlyStatesEU: Array<TabWithStates> = [];
 
         // metoda z wykorzystaniem klucza "regionalBloc", która zwraca wśród członków UE kilka terytoriów zależnych (np. Gujana Fr, Gibraltar)
         // allStates.forEach(item => {
@@ -254,11 +172,7 @@ export class TableWithStates {
         // });
 
         // metoda korzystająca ze słownika zawierającego faktycznych członków UE
-        allStates.forEach(item => {
-            nameStatesFromEU.find(el => {
-                if(el === (item.name.toLowerCase())) onlyStatesEU.push(item);
-            });
-        });
+        onlyStatesEU = allStates.filter(el => nameStatesFromEU.includes(el.name.toLowerCase()));
 
         console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
 
@@ -305,7 +219,6 @@ const storage = new StorageBrowser();
 // klasa państw z UE
 export class TableWithStatesEU {
     private states: Array<TabWithStates>;
-    private tableStatesWithDensity: Array<TabWithStates> = [];
     private tableStatesWithoutLetterA: Array<TabWithStates> = [];
 
     constructor(states: Array<TabWithStates>) {
@@ -317,15 +230,12 @@ export class TableWithStatesEU {
     }
 
     // dodaj gęstość zaludnienia
-    addDensityAndSort() {
-        this.tableStatesWithDensity = JSON.parse(JSON.stringify(this.states)) // klonowanie głębokie (nie ma referencji w obiektach zagłębionych, ale np. problem będzie z undefined)
-        
-        this.tableStatesWithDensity.forEach(item => {
+    addDensityAndSort() {        
+        this.states.forEach(item => {
             if(item.population != undefined && item.area != undefined) {
                 item.density = parseFloat((item.population / item.area).toFixed(2));
             }
         });
-        // console.log('tabela państw z gęstością zaludnienia:', this.tableStatesWithDensity);
 
         function compare(a: TabWithStates, b: TabWithStates): number {
             if(a.density != undefined && b.density != undefined) {
@@ -339,9 +249,9 @@ export class TableWithStatesEU {
             }
             return 0;
         }
-
-        this.tableStatesWithDensity.sort(compare);
-        console.log(logsTexts.tableWithStatesEU.addDensityAndSort.showTable, this.tableStatesWithDensity)
+        this.states.sort(compare)
+        
+        console.log(logsTexts.tableWithStatesEU.addDensityAndSort.showTable, this.states)
 
         this.removeLetterA();
         this.countPupulationTop5StatesEu();
@@ -349,7 +259,7 @@ export class TableWithStatesEU {
 
     // usunąć państwa posiadające literę A lub a
     removeLetterA() {
-        this.tableStatesWithDensity.forEach( item => {
+        this.states.forEach( item => {
             if( !(item.name).toLowerCase().includes('a') ) this.tableStatesWithoutLetterA.push(item);
         })
 
@@ -358,14 +268,9 @@ export class TableWithStatesEU {
 
     // suma populacji 5 najgęściej zaludnionych państw i oblicz, czy jest większa od 500 milionów
     countPupulationTop5StatesEu() {
-        const top5ByDensity = this.tableStatesWithDensity.slice(0,5);
-        const nameTop5: string[] = [];
-        let sumOfPopulation: number = 0;
-
-        for(let i=0; i<top5ByDensity.length; i++) {
-            sumOfPopulation += top5ByDensity[i].population;
-            nameTop5.push(top5ByDensity[i].name);
-        }
+        const top5ByDensity = this.states.slice(0,5);
+        const nameTop5: string[] = top5ByDensity.map(el => el.name);
+        const sumOfPopulation: number = top5ByDensity.reduce( (a,b) => a + b.population, 0)
 
         console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.info, nameTop5.join(', '))
 
@@ -375,5 +280,4 @@ export class TableWithStatesEU {
             return console.log(logsTexts.tableWithStatesEU.countPupulationTop5StatesEu.lessThan, sumOfPopulation.toString()); 
         }
     }
-    
 }
