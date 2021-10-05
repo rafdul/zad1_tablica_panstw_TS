@@ -74,8 +74,8 @@ export class TableWithStates {
 
     // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
     downloadFromApiAgain(timeDownloadFromApi: number | null): string {
-        // const MS_IN_6DAYS: number = 6*24*60*60*1000;
-        const MS_IN_6DAYS: number = 30*1000; // wartość do testów
+        const MS_IN_6DAYS: number = 6*24*60*60*1000;
+        // const MS_IN_6DAYS: number = 30*1000; // wartość do testów
         const timeNow: number = (new Date).getTime();
         let differenceInMs: number = 0;
 

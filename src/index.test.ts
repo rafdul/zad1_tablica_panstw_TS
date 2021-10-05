@@ -33,7 +33,7 @@ describe('Tests class TableWithStates. Check,', () => {
             // console.log('{{{{{{{{{{z api}}}}}}}}}}:', typeof responseJson, 'lenght:', responseJson.length);
             expect(Array.isArray(responseJson)).toEqual(true);
             expect(responseJson.length).toEqual(3);
-            expect(responseJson[2].name).toEqual('Kenia');
+            expect(responseJson.some((el: any) => el.name === 'Kenia')).toBe(true);
 
         } catch(err) {
             console.log(err);
@@ -95,7 +95,7 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
         newTableWithStatesFromAPI.infoAboutChangingPopulation(oldData1,newData);
         // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
         expect(arrWithNewPopulation.length).toBe(1);
-        expect(arrWithNewPopulation[0]).toBe('Angola');
+        expect(arrWithNewPopulation.some((el: any) => el === 'Angola')).toBe(true);
     })
 
     test('- there are NOT differences between new and old data', () => {
@@ -124,7 +124,7 @@ describe('Tests class TableWithStates. Check, ', () => {
         // console.log('====państwa przekazane do nowej instancji:', tableWithStatesEU.states);
 
         expect(onlyEU.length).toEqual(4);
-        expect(onlyEU[1].name).toEqual('Poland');
+        expect(onlyEU.findIndex((el: any) => el.name === 'Poland')).toBeGreaterThanOrEqual(0);
         expect(onlyEU[1].name).toEqual(tableWithStatesEU.states[1].name);        
     })
 })
@@ -156,8 +156,8 @@ describe('Tests class StorageBrowser. Check,', () => {
     test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for objects', () => {
         newStorage.saveStorage(keyObject, resultObject);
         let testObjectFromStorage = newStorage.getStorage(keyObject);
-        expect(testObjectFromStorage[0].surname).toEqual('ipsum');
-        expect(testObjectFromStorage[1].id).toEqual(2);
+        expect(testObjectFromStorage.findIndex((el:any) => el.surname === 'ipsum')).toBeLessThan(0);
+        expect(testObjectFromStorage.some((el:any) => el.id === 321)).toBe(true);
     });
 
     test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for numbers', () => {
@@ -176,8 +176,8 @@ describe('Tests class StorageBrowser. Check,', () => {
         newStorage.saveStorage(keyArray, resultArray);
         let testArrayFromStorage = newStorage.getStorage(keyArray);
         expect(testArrayFromStorage.length).toEqual(5);
-        expect(testArrayFromStorage).toContain('szymborska');
-        expect(testArrayFromStorage).not.toContain('herbert');
+        expect(testArrayFromStorage).toContain('meksyk');
+        expect(testArrayFromStorage).not.toContain('ekwador');
     });
 });
 

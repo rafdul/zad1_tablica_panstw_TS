@@ -38,8 +38,8 @@ export const mockValues: Values = {
     states2: [{id: 1, alpha3Code: 'MON', name: 'Monaco', population: 800000, regionalBlocs: [{acronym: 'XX'}]}, {id: 2, alpha3Code: 'SAN', name: 'San Marino', population: 49000, regionalBlocs: [{acronym: 'XX'}]}],
     states3: [{id: 1, alpha3Code: 'ANG', name: 'Angola', population: 9000000, regionalBlocs: [{acronym: 'XX'}]}, {id: 2, alpha3Code: 'BOS', name: 'Bostwana', population: 5000000, regionalBlocs: [{acronym: 'XX'}]}, {id: 3, alpha3Code: 'KEN', name: 'Kenia', population: 50000000, regionalBlocs: [{acronym: 'XX'}]}],
     states4: [{name: 'Burkina', population: 9000000, area: 67540, regionalBlocs: [{acronym: 'XX'}]}, {name: 'Surinam', population: 880000, area: 6754, regionalBlocs: [{acronym: 'XX'}]}, {name: 'Malta', population: 213000, area: 645, regionalBlocs: [{acronym: 'EU'}]}, {name: 'Poland', population: 33000000, area: 450000, regionalBlocs: [{acronym: 'EU'}]}, {name: 'Greece', population: 8000000, area: 187000, regionalBlocs: [{acronym: 'EU'}]}, {name: 'Belgium', population: 11000000, area: 120000, regionalBlocs: [{acronym: 'EU'}]}],
-    obj: {key: 'testObject', res: [{name: 'lorem', surname: 'ipsum', id: 1}, {name: 'adam', surname: 'mickiewicz', id: 2}]},
-    arr: {key: 'testArray', res: ['miłosz', 'szymborska', 'sienkiewicz', 'wyspiański', 'tokarczuk']},
+    obj: {key: 'testObject', res: [{name: 'holandia', surname: 'królestwo', id: 123}, {name: 'gujana', surname: 'republika', id: 321}]},
+    arr: {key: 'testArray', res: ['meksyk', 'brazylia', 'argentyna', 'boliwia', 'urugwaj']},
     num: {key: 'testNumber', res: 12345},
     empty: {key: 'testEmpty', res: null},
     time: {
