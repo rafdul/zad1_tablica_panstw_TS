@@ -11,6 +11,7 @@ describe('Tests class TableWithStates. Check,', () => {
 
     beforeEach(() => {
         newTableWithStatesFromAPI = new TableWithStates();
+        newStorage = new StorageBrowser();
         
         global.fetch = (): any => Promise.resolve({
             json: () => Promise.resolve(states),
@@ -19,6 +20,7 @@ describe('Tests class TableWithStates. Check,', () => {
 
     afterEach(() => {
         newTableWithStatesFromAPI = null;
+        newStorage = null;
         global.fetch = unmockedFetch;
     });
     
@@ -26,31 +28,56 @@ describe('Tests class TableWithStates. Check,', () => {
         expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
     });
 
-    test('if app can connect with API (fetch in downloadFromAPI)', async () => {
-        try{
-            const response = await fetch(JSON.stringify(states));
-            const responseJson = await response.json();
-            // console.log('{{{{{{{{{{z api}}}}}}}}}}:', typeof responseJson, 'lenght:', responseJson.length);
-            expect(Array.isArray(responseJson)).toEqual(true);
-            expect(responseJson.length).toEqual(3);
-            expect(responseJson.some((el: any) => el.name === 'Kenia')).toBe(true);
+    // test('if app can connect with API (fetch in downloadFromAPI)', async () => {
+    //     try{
+    //         const response = await fetch(JSON.stringify(states));
+    //         const responseJson = await response.json();
+    //         // console.log('{{{{{{{{{{z api}}}}}}}}}}:', typeof responseJson, 'lenght:', responseJson.length);
+    //         expect(Array.isArray(responseJson)).toEqual(true);
+    //         expect(responseJson.length).toEqual(3);
+    //         expect(responseJson.some((el: any) => el.name === 'Kenia')).toBe(true);
 
-        } catch(err) {
-            console.log(err);
-        }
+    //     } catch(err) {
+    //         console.log(err);
+    //     }
+    // });
+
+    test('if data from API are transfered to other methods (storage is empty)', () => {
+        let dataFromAPI = mockValues.states0;
+        newTableWithStatesFromAPI.getEuStates = jest.fn();
+        newTableWithStatesFromAPI.useStorage = jest.fn();
+
+        newTableWithStatesFromAPI.transferDataFromAPI(dataFromAPI)
+
+        expect(newTableWithStatesFromAPI.getEuStates).toHaveBeenCalledTimes(1);
+        expect(newTableWithStatesFromAPI.useStorage).toHaveBeenCalledTimes(1);
     });
+
+    test('if data from API are transfered to other methods (there are data in storage)', () => {
+        let dataFromAPI = mockValues.states0;
+        newStorage.saveStorage('states', dataFromAPI)
+        newTableWithStatesFromAPI.getEuStates = jest.fn();
+        newTableWithStatesFromAPI.useStorage = jest.fn();
+        newTableWithStatesFromAPI.infoAboutChangingPopulation = jest.fn();
+
+        newTableWithStatesFromAPI.transferDataFromAPI(dataFromAPI)
+
+        expect(newTableWithStatesFromAPI.getEuStates).toHaveBeenCalledTimes(1);
+        expect(newTableWithStatesFromAPI.useStorage).toHaveBeenCalledTimes(1);
+        expect(newTableWithStatesFromAPI.infoAboutChangingPopulation).toHaveBeenCalledTimes(1);
+    })
 });
 
 describe('Tests class TableWithStates. Check, if app use local storage or API again:', () => {
     let number6Days = mockValues.time.number6Days;
     let numberGreaterThan6Days = mockValues.time.numberGreaterThan6Days;
-    let numberLess6Days = mockValues.time.numberLess6Days;
-    let numberLess6Days2 = mockValues.time.numberLess6Days2;
-    let numberLess6Days3 = mockValues.time.numberLess6Days3;
+    let numberLess6Days_1ms = mockValues.time.numberLess6Days;
+    let numberLess6Days2_nearly6Days = mockValues.time.numberLess6Days_v2;
+    let numberLess6Days3_1s = mockValues.time.numberLess6Days_v3;
     let notNumber = null;
 
     let arrApi = [number6Days, numberGreaterThan6Days, notNumber];
-    let arrStorage = [numberLess6Days, numberLess6Days2, numberLess6Days3]
+    let arrStorage = [numberLess6Days_1ms, numberLess6Days2_nearly6Days, numberLess6Days3_1s]
 
     beforeEach(() => {
         newTableWithStatesFromAPI = new TableWithStates();
@@ -65,14 +92,14 @@ describe('Tests class TableWithStates. Check, if app use local storage or API ag
             console.log('====api===', arrApi[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i]))
             expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i])).toBe('api')
         }
-    })
+    });
 
     test('- app should choose local storage', () => {
         for(let i=0; i<arrStorage.length; i++) {
             console.log('====storage===', arrStorage[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i]))
             expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i])).toBe('storage')
         }
-    })
+    });
 })
 
 describe('Tests class TableWithStates. Check, if app can compare population between new and old data:', () => {
@@ -96,7 +123,7 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
         // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
         expect(arrWithNewPopulation.length).toBe(1);
         expect(arrWithNewPopulation.some((el: any) => el === 'Angola')).toBe(true);
-    })
+    });
 
     test('- there are NOT differences between new and old data', () => {
         arrWithNewPopulation = newTableWithStatesFromAPI.tableAfterComparison;
@@ -104,7 +131,7 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
         // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
         expect(arrWithNewPopulation.length).toBe(0);
         expect(arrWithNewPopulation[0]).toBe(undefined);
-    })
+    });
 
 })
 
@@ -126,7 +153,7 @@ describe('Tests class TableWithStates. Check, ', () => {
         expect(onlyEU.length).toEqual(4);
         expect(onlyEU.findIndex((el: any) => el.name === 'Poland')).toBeGreaterThanOrEqual(0);
         expect(onlyEU[1].name).toEqual(tableWithStatesEU.states[1].name);        
-    })
+    });
 })
 
 
@@ -151,7 +178,7 @@ describe('Tests class StorageBrowser. Check,', () => {
 
     test('if new object is created as instance of StorageBrowser', () => {
         expect(newStorage).toBeInstanceOf(StorageBrowser);
-    })
+    });
 
     test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for objects', () => {
         newStorage.saveStorage(keyObject, resultObject);
@@ -187,11 +214,11 @@ let tableWithStatesEU: any = null;
 describe('Tests class TableWithStatesEU. Check,', () => {
     beforeEach(() => {
         tableWithStatesEU = new TableWithStatesEU(mockValues.states4);
-    })
+    });
 
     afterEach(() => {
         tableWithStatesEU = null;
-    })
+    });
 
     test('if new object is created as instance of TableWithStatesEU ', () => {
         expect(tableWithStatesEU).toBeInstanceOf(TableWithStatesEU);

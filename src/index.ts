@@ -20,9 +20,7 @@
  * Kod może posiadać komentarze.
 **/
 
-import { TabWithStates, logsTexts } from './textsAndInterfaces'
-
-
+import { TabWithStates, logsTexts, MS_IN_6DAYS, apiUrl } from './config'
 
 window.onload = function() {
     console.log('App started!');
@@ -32,7 +30,7 @@ window.onload = function() {
 
 export class TableWithStates {
 
-    private url: string = "https://restcountries.com/v2/all";
+    private url: string = apiUrl;
     private dateDownloadFromApi: number = 0;
     private tableStatesFromApi: Array<{}> = [];
     private tableAfterComparison: Array<{}> = [];
@@ -53,29 +51,36 @@ export class TableWithStates {
             .then(response => response.json())
             .then(data => {
                 console.log(logsTexts.tableWithStates.downloadFromAPI.success, data);
-                this.tableStatesFromApi = data;
 
-                if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
-                    this.infoAboutChangingPopulation(storage.getStorage('states'), data);
-                }
-
-                let time: Date = new Date();
-                this.dateDownloadFromApi = time.getTime();
-                storage.saveStorage('date', this.dateDownloadFromApi);
-                
-                storage.saveStorage('states', data);
-
-                this.getEuStates(data);
+                this.transferDataFromAPI(data);
             })
             .catch(err => {
                 throw new Error(logsTexts.tableWithStates.downloadFromAPI.failure)
             })
     }
 
+    transferDataFromAPI(dataFromAPI: any): void {
+        this.tableStatesFromApi = dataFromAPI;
+        let dateDownloadFromApi: number = (new Date).getTime()
+        this.dateDownloadFromApi = dateDownloadFromApi;
+
+        if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
+            this.infoAboutChangingPopulation(storage.getStorage('states'), dataFromAPI);
+        }
+
+        this.useStorage(dataFromAPI, dateDownloadFromApi);
+
+        this.getEuStates(dataFromAPI);
+    }
+
+    useStorage(dataFromAPI: any, dateDownload: number): void {
+        storage.saveStorage('date', dateDownload);
+        
+        storage.saveStorage('states', dataFromAPI);
+    }
+
     // sprawdzenie, czy ponowanie pobrać dane z API (zwrócenie flagi true = pobrać, false = korzystać z localStorage)
     downloadFromApiAgain(timeDownloadFromApi: number | null): string {
-        const MS_IN_6DAYS: number = 6*24*60*60*1000;
-        // const MS_IN_6DAYS: number = 30*1000; // wartość do testów
         const timeNow: number = (new Date).getTime();
         let differenceInMs: number = 0;
 
@@ -131,22 +136,20 @@ export class TableWithStates {
 
     // generowanie tablicy TYLKO z danymi o państwach UE + wyeliminować ryzyko różnego zapisu nazwy kraju (małe / duże litery)
     getEuStates(allStates: Array<TabWithStates>):Array<TabWithStates> {
-        const nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
         let  onlyStatesEU: Array<TabWithStates> = [];
 
-        // metoda z wykorzystaniem klucza "regionalBloc", która zwraca wśród członków UE kilka terytoriów zależnych (np. Gujana Fr, Gibraltar)
-        // allStates.forEach(item => {
-        //     if(item.regionalBlocs) {
-        //         for(let i = 0; i < item.regionalBlocs.length; i++) {
-        //             if(item.regionalBlocs[i].acronym === 'EU') onlyStatesEU.push(item);
-        //         }
-        //     }
-        // });
+        /* metoda z wykorzystaniem klucza "regionalBloc", która zwraca wśród członków UE kilka terytoriów zależnych (np. Gujana Fr, Gibraltar) */
+        allStates.filter(el => {
+            if(el.regionalBlocs && el.regionalBlocs.find(i => i.acronym === 'EU')) {
+                onlyStatesEU.push(el);
+            }
+        });
 
-        // metoda korzystająca ze słownika zawierającego faktycznych członków UE
-        onlyStatesEU = allStates.filter(el => nameStatesFromEU.includes(el.name.toLowerCase()));
-
-        // console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
+        /* metoda korzystająca ze słownika zawierającego faktycznych członków UE */
+        // const nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
+        // onlyStatesEU = allStates.filter(el => nameStatesFromEU.includes(el.name.toLowerCase()));
+        
+        console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
 
         const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
         tableWithStatesEU.init();

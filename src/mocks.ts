@@ -1,5 +1,5 @@
-const MS_IN_6DAYS: number = 6*24*60*60*1000;
-// const MS_IN_6DAYS: number = 30*1000; // zmienić, gdy w index.ts zmienię okres korzystania z local storage
+import {MS_IN_6DAYS} from './config'
+
 const timeNow: number = (new Date).getTime();
 
 interface TabWithStates {
@@ -23,11 +23,12 @@ interface Values {
     num: {key: string, res: number},
     empty: {key: string, res: null},
     time: {
+        dateDownloadMS: number,
         number6Days: number, 
         numberGreaterThan6Days: number, 
         numberLess6Days: number, 
-        numberLess6Days2: number, 
-        numberLess6Days3: number, 
+        numberLess6Days_v2: number, 
+        numberLess6Days_v3: number, 
         notNumber: null,
     },
 }
@@ -43,11 +44,12 @@ export const mockValues: Values = {
     num: {key: 'testNumber', res: 12345},
     empty: {key: 'testEmpty', res: null},
     time: {
+        dateDownloadMS: 1633513106822,
         number6Days: (timeNow - MS_IN_6DAYS), 
         numberGreaterThan6Days: (timeNow - MS_IN_6DAYS - 1), 
         numberLess6Days: (timeNow - 1), 
-        numberLess6Days2: (timeNow - MS_IN_6DAYS + 1000), 
-        numberLess6Days3: (timeNow - 1000), 
+        numberLess6Days_v2: (timeNow - MS_IN_6DAYS + 1000), 
+        numberLess6Days_v3: (timeNow - 1000), 
         notNumber: null,
     },
 }

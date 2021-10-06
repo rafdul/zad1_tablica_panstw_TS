@@ -1,3 +1,7 @@
+// export const MS_IN_6DAYS: number = 6*24*60*60*1000;
+export const MS_IN_6DAYS: number = 30*1000; // wartość do testów
+export const apiUrl: string = 'https://restcountries.com/v2/all';
+
 interface Texts {
     tableWithStates: {
         init: {getFromStorage: string, dataInStorage: string, connectWithApi: string},
