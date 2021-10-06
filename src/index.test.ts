@@ -249,11 +249,10 @@ describe('Tests class TableWithStatesEU. Check,', () => {
         expect(tableWithStatesEU.countPopulationForAFewStatesEu).toHaveBeenCalledTimes(1);
     });
 
-    test('if states are sorted by density', () => {
+    test('if states were sorted by density', () => {
         const testStates = mockValues.statesWithDensity;
         tableWithStatesEU.compareStates(testStates, 'density');
         
-        // console.log('+=+=+=+=+2', testStates);
         expect(testStates.length).toEqual(4);
         expect(testStates[0].name).toEqual('Netherlands');
 
@@ -263,6 +262,21 @@ describe('Tests class TableWithStatesEU. Check,', () => {
             expect(diff1).toBeGreaterThan(0);
             expect(diff2).toBeLessThan(0);
         }
-        
+    });
+
+    test('if letter "a" was removed from name of countries', () => {
+        const testStates = mockValues.states4;;
+        tableWithStatesEU.removeLetterA(testStates, 'a');
+
+        expect(tableWithStatesEU.tableStatesWithoutLetterA.length).toEqual(2);
+        expect(tableWithStatesEU.tableStatesWithoutLetterA.some((el: any) => el.name === 'Belgium')).toBe(true);
+    });
+
+    test('if app can sum population of countries', () => {
+        const testStates = mockValues.statesWithDensity;
+        const populationTop2FromTestStates = 28140035;
+        let res = tableWithStatesEU.countPopulationForAFewStatesEu(testStates, 2)
+
+        expect(res).toEqual(populationTop2FromTestStates);
     });
 })
