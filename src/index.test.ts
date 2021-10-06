@@ -1,5 +1,5 @@
 import { TableWithStates, StorageBrowser, TableWithStatesEU } from './index';
-import { mockValues } from './mocks'
+import { mockValues, TabWithStates } from './mocks'
 
 let newTableWithStatesFromAPI: any = null;
 let newStorage: any = null;
@@ -212,16 +212,57 @@ describe('Tests class StorageBrowser. Check,', () => {
 let tableWithStatesEU: any = null;
  
 describe('Tests class TableWithStatesEU. Check,', () => {
+    let statesEU: [] | Array<TabWithStates> = [];
+
     beforeEach(() => {
         tableWithStatesEU = new TableWithStatesEU(mockValues.states4);
+        statesEU = tableWithStatesEU.states;
     });
 
     afterEach(() => {
         tableWithStatesEU = null;
+        statesEU = [];
     });
 
     test('if new object is created as instance of TableWithStatesEU ', () => {
         expect(tableWithStatesEU).toBeInstanceOf(TableWithStatesEU);
         // console.log(tableWithStatesEU)
+    });
+
+    test('if density is added', () => {
+        tableWithStatesEU.addDensityAndSort(statesEU);
+
+        expect(statesEU.filter((el: any) => !el.density)).toStrictEqual([]);
+        expect(typeof statesEU[2].density).toBe('number');
+        expect(statesEU[2].density).toBeGreaterThan(0);
+    });
+
+    test('if addDensityAndSort calls other methods', () => {
+        tableWithStatesEU.compareStates = jest.fn();
+        tableWithStatesEU.removeLetterA = jest.fn();
+        tableWithStatesEU.countPopulationForAFewStatesEu = jest.fn();
+
+        tableWithStatesEU.addDensityAndSort(statesEU);
+
+        expect(tableWithStatesEU.compareStates).toHaveBeenCalledTimes(1);
+        expect(tableWithStatesEU.removeLetterA).toHaveBeenCalledTimes(1);
+        expect(tableWithStatesEU.countPopulationForAFewStatesEu).toHaveBeenCalledTimes(1);
+    });
+
+    test('if states are sorted by density', () => {
+        const testStates = mockValues.statesWithDensity;
+        tableWithStatesEU.compareStates(testStates, 'density');
+        
+        // console.log('+=+=+=+=+2', testStates);
+        expect(testStates.length).toEqual(4);
+        expect(testStates[0].name).toEqual('Netherlands');
+
+        if(testStates[0].density != undefined && testStates[1].density != undefined && testStates[2].density != undefined && testStates[3].density != undefined) {
+            let diff1 = (testStates[0].density) - (testStates[1].density);
+            let diff2 = (testStates[3].density) - (testStates[2].density);
+            expect(diff1).toBeGreaterThan(0);
+            expect(diff2).toBeLessThan(0);
+        }
+        
     });
 })

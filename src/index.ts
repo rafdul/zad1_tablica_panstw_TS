@@ -201,24 +201,24 @@ export class TableWithStatesEU {
     }
 
     init() {
-        this.addDensityAndSort();
+        this.addDensityAndSort(this.states);
     }
 
     // dodaj gęstość zaludnienia
-    addDensityAndSort() {        
-        this.states.forEach(item => {
+    addDensityAndSort(tableStates:  Array<TabWithStates>): void {        
+        tableStates.forEach(item => {
             if(item.population != undefined && item.area != undefined) {
                 item.density = parseFloat((item.population / item.area).toFixed(2));
             }
         });
 
-        this.compareStates(this.states, 'density')
-        this.removeLetterA(this.states, 'a');
-        this.countPopulationForAFewStatesEu(this.states, 5);
+        this.compareStates(tableStates, 'density')
+        this.removeLetterA(tableStates, 'a');
+        this.countPopulationForAFewStatesEu(tableStates, 5);
     }
 
     // sortowanie państw wg jakiegoś kryterium (keyBySort)
-    compareStates(tableWithStates:Array<TabWithStates>, keyBySort:string):Array<TabWithStates> {
+    compareStates(tableWithStates:Array<TabWithStates>, keyBySort:string): Array<TabWithStates> {
         function compare(a:any, b:any): number  {
             if(typeof a[keyBySort] === 'number' && typeof b[keyBySort] === 'number') {
                 if (a[keyBySort] > b[keyBySort]) {
