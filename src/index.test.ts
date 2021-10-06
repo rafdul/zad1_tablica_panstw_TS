@@ -3,6 +3,7 @@ import { mockValues, TabWithStates } from './mocks'
 
 let newTableWithStatesFromAPI: any = null;
 let newStorage: any = null;
+let tableWithStatesEU: any = null;
 
 // tests for class TableWithStates
 describe('Tests class TableWithStates. Check,', () => {
@@ -28,34 +29,9 @@ describe('Tests class TableWithStates. Check,', () => {
         expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
     });
 
-    // test('if app can connect with API (fetch in downloadFromAPI)', async () => {
-    //     try{
-    //         const response = await fetch(JSON.stringify(states));
-    //         const responseJson = await response.json();
-    //         // console.log('{{{{{{{{{{z api}}}}}}}}}}:', typeof responseJson, 'lenght:', responseJson.length);
-    //         expect(Array.isArray(responseJson)).toEqual(true);
-    //         expect(responseJson.length).toEqual(3);
-    //         expect(responseJson.some((el: any) => el.name === 'Kenia')).toBe(true);
-
-    //     } catch(err) {
-    //         console.log(err);
-    //     }
-    // });
 
     test('if data from API are transfered to other methods (storage is empty)', () => {
         let dataFromAPI = mockValues.states0;
-        newTableWithStatesFromAPI.getEuStates = jest.fn();
-        newTableWithStatesFromAPI.useStorage = jest.fn();
-
-        newTableWithStatesFromAPI.transferDataFromAPI(dataFromAPI)
-
-        expect(newTableWithStatesFromAPI.getEuStates).toHaveBeenCalledTimes(1);
-        expect(newTableWithStatesFromAPI.useStorage).toHaveBeenCalledTimes(1);
-    });
-
-    test('if data from API are transfered to other methods (there are data in storage)', () => {
-        let dataFromAPI = mockValues.states0;
-        newStorage.saveStorage('states', dataFromAPI)
         newTableWithStatesFromAPI.getEuStates = jest.fn();
         newTableWithStatesFromAPI.useStorage = jest.fn();
         newTableWithStatesFromAPI.infoAboutChangingPopulation = jest.fn();
@@ -64,6 +40,16 @@ describe('Tests class TableWithStates. Check,', () => {
 
         expect(newTableWithStatesFromAPI.getEuStates).toHaveBeenCalledTimes(1);
         expect(newTableWithStatesFromAPI.useStorage).toHaveBeenCalledTimes(1);
+        expect(newTableWithStatesFromAPI.infoAboutChangingPopulation).toHaveBeenCalledTimes(0);
+    });
+
+    test('if data from API are transfered to other methods (there are data in storage)', () => {
+        let dataFromAPI = mockValues.states0;
+        newStorage.saveStorage('states', dataFromAPI)
+        newTableWithStatesFromAPI.infoAboutChangingPopulation = jest.fn();
+
+        newTableWithStatesFromAPI.transferDataFromAPI(dataFromAPI)
+
         expect(newTableWithStatesFromAPI.infoAboutChangingPopulation).toHaveBeenCalledTimes(1);
     })
 });
@@ -76,8 +62,14 @@ describe('Tests class TableWithStates. Check, if app use local storage or API ag
     let numberLess6Days3_1s = mockValues.time.numberLess6Days_v3;
     let notNumber = null;
 
-    let arrApi = [number6Days, numberGreaterThan6Days, notNumber];
-    let arrStorage = [numberLess6Days_1ms, numberLess6Days2_nearly6Days, numberLess6Days3_1s]
+    let arrVariants = [
+        {a: number6Days, expected: 'api'}, 
+        {a: numberGreaterThan6Days, expected: 'api'}, 
+        {a: notNumber, expected: 'api'},
+        {a: numberLess6Days_1ms, expected: 'storage'},
+        {a: numberLess6Days2_nearly6Days, expected: 'storage'},
+        {a: numberLess6Days3_1s, expected: 'storage'},
+    ]
 
     beforeEach(() => {
         newTableWithStatesFromAPI = new TableWithStates();
@@ -87,18 +79,8 @@ describe('Tests class TableWithStates. Check, if app use local storage or API ag
         newTableWithStatesFromAPI = null;
     });
 
-    test('- app should choose API', () => {
-        for(let i=0; i<arrApi.length; i++) {
-            console.log('====api===', arrApi[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i]))
-            expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrApi[i])).toBe('api')
-        }
-    });
-
-    test('- app should choose local storage', () => {
-        for(let i=0; i<arrStorage.length; i++) {
-            console.log('====storage===', arrStorage[i], newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i]))
-            expect(newTableWithStatesFromAPI.downloadFromApiAgain(arrStorage[i])).toBe('storage')
-        }
+    test.each(arrVariants)(`test of different variants`, ({a, expected}) => {
+        expect(newTableWithStatesFromAPI.downloadFromApiAgain(a)).toBe(expected);
     });
 })
 
@@ -106,7 +88,7 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
     let arrWithNewPopulation: Array<{}> = [];
     const newData = mockValues.states0;
     const oldData1 = mockValues.states3;
-    const oldData2 = mockValues.states0;
+    const oldData2 = mockValues.states1;
 
     beforeEach(() => {
         newTableWithStatesFromAPI = new TableWithStates();
@@ -130,9 +112,7 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
         newTableWithStatesFromAPI.infoAboutChangingPopulation(oldData2,newData);
         // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
         expect(arrWithNewPopulation.length).toBe(0);
-        expect(arrWithNewPopulation[0]).toBe(undefined);
     });
-
 })
 
 describe('Tests class TableWithStates. Check, ', () => {
@@ -156,18 +136,8 @@ describe('Tests class TableWithStates. Check, ', () => {
     });
 })
 
-
 // tests for class StorageBrowser
 describe('Tests class StorageBrowser. Check,', () => {
-    let keyObject = mockValues.obj.key;
-    let resultObject = mockValues.obj.res;
-    let keyArray = mockValues.arr.key;
-    let resultArray = mockValues.arr.res;
-    let keyNumber = mockValues.num.key;
-    let resultNumber = mockValues.num.res;
-    let keyEmpty = mockValues.empty.key;
-    let resultEmpty = mockValues.empty.res;
-
     beforeEach(() => {
         newStorage = new StorageBrowser();
     });
@@ -181,36 +151,50 @@ describe('Tests class StorageBrowser. Check,', () => {
     });
 
     test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for objects', () => {
+        let keyObject = mockValues.obj.key;
+        let resultObject = mockValues.obj.res;
+
         newStorage.saveStorage(keyObject, resultObject);
         let testObjectFromStorage = newStorage.getStorage(keyObject);
+
         expect(testObjectFromStorage.findIndex((el:any) => el.surname === 'ipsum')).toBeLessThan(0);
         expect(testObjectFromStorage.some((el:any) => el.id === 321)).toBe(true);
     });
 
     test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for numbers', () => {
+        let keyNumber = mockValues.num.key;
+        let resultNumber = mockValues.num.res;
+
         newStorage.saveStorage(keyNumber, resultNumber);
         let testNumberFromStorage = newStorage.getStorage(keyNumber);
+
         expect(testNumberFromStorage).toBe(12345);
     });
 
     test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for null', () => {
+        let keyEmpty = mockValues.empty.key;
+        let resultEmpty = mockValues.empty.res;
+
         newStorage.saveStorage(keyEmpty, resultEmpty);
         let testEmptyFromStorage = newStorage.getStorage(keyEmpty);
+
         expect(testEmptyFromStorage).toBe(resultEmpty);
     });
 
     test('if methods for setting (saveStorage) and getting of localStorage (getStorage) are working for arrays', () => {
+        let keyArray = mockValues.arr.key;
+        let resultArray = mockValues.arr.res;
+
         newStorage.saveStorage(keyArray, resultArray);
         let testArrayFromStorage = newStorage.getStorage(keyArray);
+
         expect(testArrayFromStorage.length).toEqual(5);
         expect(testArrayFromStorage).toContain('meksyk');
         expect(testArrayFromStorage).not.toContain('ekwador');
     });
 });
 
-// tests for class TableWithStatesEU
-let tableWithStatesEU: any = null;
- 
+// tests for class TableWithStatesEU 
 describe('Tests class TableWithStatesEU. Check,', () => {
     let statesEU: [] | Array<TabWithStates> = [];
 
@@ -237,18 +221,6 @@ describe('Tests class TableWithStatesEU. Check,', () => {
         expect(statesEU[2].density).toBeGreaterThan(0);
     });
 
-    test('if addDensityAndSort calls other methods', () => {
-        tableWithStatesEU.compareStates = jest.fn();
-        tableWithStatesEU.removeLetterA = jest.fn();
-        tableWithStatesEU.countPopulationForAFewStatesEu = jest.fn();
-
-        tableWithStatesEU.addDensityAndSort(statesEU);
-
-        expect(tableWithStatesEU.compareStates).toHaveBeenCalledTimes(1);
-        expect(tableWithStatesEU.removeLetterA).toHaveBeenCalledTimes(1);
-        expect(tableWithStatesEU.countPopulationForAFewStatesEu).toHaveBeenCalledTimes(1);
-    });
-
     test('if states were sorted by density', () => {
         const testStates = mockValues.statesWithDensity;
         tableWithStatesEU.compareStates(testStates, 'density');
@@ -256,7 +228,10 @@ describe('Tests class TableWithStatesEU. Check,', () => {
         expect(testStates.length).toEqual(4);
         expect(testStates[0].name).toEqual('Netherlands');
 
-        if(testStates[0].density != undefined && testStates[1].density != undefined && testStates[2].density != undefined && testStates[3].density != undefined) {
+        if(testStates[0].density != undefined && 
+        testStates[1].density != undefined && 
+        testStates[2].density != undefined && 
+        testStates[3].density != undefined) {
             let diff1 = (testStates[0].density) - (testStates[1].density);
             let diff2 = (testStates[3].density) - (testStates[2].density);
             expect(diff1).toBeGreaterThan(0);
@@ -264,19 +239,24 @@ describe('Tests class TableWithStatesEU. Check,', () => {
         }
     });
 
-    test('if letter "a" was removed from name of countries', () => {
-        const testStates = mockValues.states4;;
-        tableWithStatesEU.removeLetterA(testStates, 'a');
+    test('if app can remove indicated letter from name of countries', () => {
+        const testStatesM = mockValues.states2;
+        let resWithoutM = tableWithStatesEU.removeLetterA(testStatesM, 'm');
 
-        expect(tableWithStatesEU.tableStatesWithoutLetterA.length).toEqual(2);
-        expect(tableWithStatesEU.tableStatesWithoutLetterA.some((el: any) => el.name === 'Belgium')).toBe(true);
+        expect(resWithoutM.length).toEqual(2);
+        expect(resWithoutM.some((el: any) => el.name === 'Kenia')).toBe(true);
     });
 
     test('if app can sum population of countries', () => {
-        const testStates = mockValues.statesWithDensity;
-        const populationTop2FromTestStates = 28140035;
-        let res = tableWithStatesEU.countPopulationForAFewStatesEu(testStates, 2)
+        const testStates = mockValues.statesWithPopulation;
+        const testStatesPopulationTop2 = 21052338;
+        const testStatesPopulationTop3 = 38493477;
 
-        expect(res).toEqual(populationTop2FromTestStates);
+        let resTop2 = tableWithStatesEU.countPopulationForAFewStatesEu(testStates, 2);
+        let resTop3 = tableWithStatesEU.countPopulationForAFewStatesEu(testStates, 3)
+
+        expect(resTop2).toEqual(testStatesPopulationTop2);
+        expect(resTop3).toEqual(testStatesPopulationTop3);
+        expect(resTop2).toBeLessThan(resTop3);
     });
 })

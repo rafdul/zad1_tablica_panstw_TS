@@ -32,7 +32,7 @@ export class TableWithStates {
 
     private url: string = apiUrl;
     private dateDownloadFromApi: number = 0;
-    private tableStatesFromApi: Array<{}> = [];
+    private tableStatesFromApi: Array<TabWithStates> = [];
     private tableAfterComparison: Array<{}> = [];
 
     init(): void {
@@ -61,19 +61,18 @@ export class TableWithStates {
 
     transferDataFromAPI(dataFromAPI: any): void {
         this.tableStatesFromApi = dataFromAPI;
-        let dateDownloadFromApi: number = (new Date).getTime()
-        this.dateDownloadFromApi = dateDownloadFromApi;
+        this.dateDownloadFromApi = (new Date).getTime();
 
         if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
-            this.infoAboutChangingPopulation(storage.getStorage('states'), dataFromAPI);
+            this.infoAboutChangingPopulation(storage.getStorage('states'), this.tableStatesFromApi);
         }
 
-        this.useStorage(dataFromAPI, dateDownloadFromApi);
-
-        this.getEuStates(dataFromAPI);
+        this.useStorage(this.tableStatesFromApi, this.dateDownloadFromApi);
+        
+        this.getEuStates(this.tableStatesFromApi);
     }
 
-    useStorage(dataFromAPI: any, dateDownload: number): void {
+    useStorage(dataFromAPI: Array<TabWithStates>, dateDownload: number): void {
         storage.saveStorage('date', dateDownload);
         
         storage.saveStorage('states', dataFromAPI);
@@ -114,7 +113,7 @@ export class TableWithStates {
     }
 
     // porównanie populacji z dwóch zbiorów danych
-    comparePopulationBetweenData(stateDataOld: any, stateDataNew:any) { 
+    comparePopulationBetweenData(stateDataOld: any, stateDataNew: any): void { 
         if(stateDataOld.alpha3Code === stateDataNew.alpha3Code && 
             stateDataOld.population !== stateDataNew.population) {
             this.tableAfterComparison.push(stateDataOld.name);
@@ -123,7 +122,7 @@ export class TableWithStates {
     }
 
     // pętla po starym zestawie danych
-    infoAboutChangingPopulation(oldData: [], newData: []): void {
+    infoAboutChangingPopulation(oldData: Array<TabWithStates>, newData: Array<TabWithStates>): void {
         for(let i = 0; i < oldData.length; i++) {
             if(newData.length>0) {
                 newData.filter(el => this.comparePopulationBetweenData(el, oldData[i]));
@@ -135,7 +134,7 @@ export class TableWithStates {
     }
 
     // generowanie tablicy TYLKO z danymi o państwach UE + wyeliminować ryzyko różnego zapisu nazwy kraju (małe / duże litery)
-    getEuStates(allStates: Array<TabWithStates>):Array<TabWithStates> {
+    getEuStates(allStates: Array<TabWithStates>): Array<TabWithStates> {
         let  onlyStatesEU: Array<TabWithStates> = [];
 
         /* metoda z wykorzystaniem klucza "regionalBloc", która zwraca wśród członków UE kilka terytoriów zależnych (np. Gujana Fr, Gibraltar) */
