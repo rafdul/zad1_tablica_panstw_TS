@@ -22,13 +22,12 @@ describe(`Different scenarios of app's init:`, () => {
         // console.log('flaga ze stora',newTableWithStatesFromAPI.downloadFromApiAgain(newStorage.getStorage('date')), ' długość tablicy w store ', newStorage.getStorage('states'))
         
         newTableWithStatesFromAPI.downloadFromAPI = jest.fn()
-        newTableWithStatesFromAPI.getEuStates = jest.fn()
+        newTableWithStatesFromAPI.selectStatesByBlock = jest.fn()
         
         newTableWithStatesFromAPI.init();
 
         expect(newTableWithStatesFromAPI.downloadFromAPI).toBeCalledTimes(1)
-        expect(newTableWithStatesFromAPI.getEuStates).not.toBeCalled()
-        expect(newTableWithStatesFromAPI.getEuStates).toBeCalledTimes(0)
+        expect(newTableWithStatesFromAPI.selectStatesByBlock).not.toBeCalled()
         // expect(newTableWithStatesFromAPI.tableStatesFromApi.length).toEqual(3);
         // expect(newTableWithStatesFromAPI.tableStatesFromApi.some((el: any) => el.name === 'Angola')).toBe(true);
     });
@@ -39,12 +38,11 @@ describe(`Different scenarios of app's init:`, () => {
         // console.log('flaga ze stora',newTableWithStatesFromAPI.downloadFromApiAgain(newStorage.getStorage('date')), ' długość tablicy w store ', newStorage.getStorage('states').length)
         
         newTableWithStatesFromAPI.downloadFromAPI = jest.fn()
-        newTableWithStatesFromAPI.getEuStates = jest.fn()
+        newTableWithStatesFromAPI.selectStatesByBlock = jest.fn()
 
         newTableWithStatesFromAPI.init();
 
-        expect(newTableWithStatesFromAPI.downloadFromAPI).toBeCalledTimes(0)
-        expect(newTableWithStatesFromAPI.getEuStates).toBeCalledTimes(1)
+        expect(newTableWithStatesFromAPI.selectStatesByBlock).toBeCalledTimes(1)
         expect(newTableWithStatesFromAPI.downloadFromAPI).not.toBeCalled()
     });
 
@@ -54,12 +52,11 @@ describe(`Different scenarios of app's init:`, () => {
         // console.log('flaga ze stora',newTableWithStatesFromAPI.downloadFromApiAgain(newStorage.getStorage('date')), ' długość tablicy w store ', newStorage.getStorage('states').length)
         
         newTableWithStatesFromAPI.downloadFromAPI = jest.fn()
-        newTableWithStatesFromAPI.getEuStates = jest.fn()
+        newTableWithStatesFromAPI.selectStatesByBlock = jest.fn()
 
         newTableWithStatesFromAPI.init();
 
         expect(newTableWithStatesFromAPI.downloadFromAPI).toBeCalledTimes(1)
-        expect(newTableWithStatesFromAPI.getEuStates).toBeCalledTimes(0)
-        expect(newTableWithStatesFromAPI.getEuStates).not.toBeCalled()
+        expect(newTableWithStatesFromAPI.selectStatesByBlock).not.toBeCalled()
     });
 })

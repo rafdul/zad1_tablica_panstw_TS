@@ -32,14 +32,13 @@ export class TableWithStates {
 
     private url: string = apiUrl;
     private dateDownloadFromApi: number = 0;
-    private tableStatesFromApi: Array<TabWithStates> = [];
-    private tableAfterComparison: Array<{}> = [];
+    private tableAfterComparison: Array<string> = [];
 
     init(): void {
         if( this.downloadFromApiAgain( storage.getStorage('date') ) === 'storage' && storage.getStorage('states').length > 0 ) {
             console.log(logsTexts.tableWithStates.init.getFromStorage, storage.getStorage('states').length);
             console.log(logsTexts.tableWithStates.init.dataInStorage, storage.getStorage('states'));
-            this.getEuStates(storage.getStorage('states'));
+            this.selectStatesByBlock(storage.getStorage('states'), 'EU');
         } else {
             console.log(logsTexts.tableWithStates.init.connectWithApi);
             this.downloadFromAPI();
@@ -59,17 +58,16 @@ export class TableWithStates {
             })
     }
 
-    transferDataFromAPI(dataFromAPI: any): void {
-        this.tableStatesFromApi = dataFromAPI;
+    transferDataFromAPI(dataFromAPI: Array<TabWithStates>): void {
         this.dateDownloadFromApi = (new Date).getTime();
 
         if(storage.getStorage('states') && storage.getStorage('states').length > 0) {
-            this.infoAboutChangingPopulation(storage.getStorage('states'), this.tableStatesFromApi);
+            this.infoAboutChangingPopulation(storage.getStorage('states'), dataFromAPI);
         }
 
-        this.useStorage(this.tableStatesFromApi, this.dateDownloadFromApi);
+        this.useStorage(dataFromAPI, this.dateDownloadFromApi);
                     
-        this.getEuStates(this.tableStatesFromApi);
+        this.selectStatesByBlock(dataFromAPI, 'EU');
     }
 
     useStorage(dataFromAPI: Array<TabWithStates>, dateDownload: number): void {
@@ -134,12 +132,12 @@ export class TableWithStates {
     }
 
     // generowanie tablicy TYLKO z danymi o państwach UE + wyeliminować ryzyko różnego zapisu nazwy kraju (małe / duże litery)
-    getEuStates(allStates: Array<TabWithStates>): Array<TabWithStates> {
+    selectStatesByBlock(allStates: Array<TabWithStates>, keyBlock: string): Array<TabWithStates> {
         let  onlyStatesEU: Array<TabWithStates> = [];
 
         /* metoda z wykorzystaniem klucza "regionalBloc", która zwraca wśród członków UE kilka terytoriów zależnych (np. Gujana Fr, Gibraltar) */
         allStates.filter(el => {
-            if(el.regionalBlocs && el.regionalBlocs.find(i => i.acronym === 'EU')) {
+            if(el.regionalBlocs && el.regionalBlocs.find(i => i.acronym === keyBlock)) {
                 onlyStatesEU.push(el);
             }
         });
@@ -163,7 +161,7 @@ const tableWithStates = new TableWithStates();
 // klasa od localStorage; oddzielne metody do zapisu i odczytu danych o państwach oraz daty pobrania z API
 export class StorageBrowser {
     getStorage(key: string): any {
-        let content: number | [] | null = null;
+        let content: number | Array<TabWithStates> | null = null;
         let contentInLocalStorage: string|null = localStorage.getItem(key);
 
         if(contentInLocalStorage !== null) { 
@@ -223,10 +221,6 @@ export class TableWithStatesEU {
                 if (a[keyBySort] > b[keyBySort]) {
                     return -1;
                 }
-                if (a[keyBySort] < b[keyBySort]) {
-                    return 1;
-                }
-                return 0;
             }
             return 0;
         }

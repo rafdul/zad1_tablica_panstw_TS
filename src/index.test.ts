@@ -88,7 +88,7 @@ describe('Tests class TableWithStates. Check, if app can compare population betw
     test('- there are differences between new and old data', () => {
         arrWithNewPopulation = newTableWithStatesFromAPI.tableAfterComparison;
         newTableWithStatesFromAPI.infoAboutChangingPopulation(oldData1,newData);
-        // console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
+        console.log('==arrWithNewPopulation1.length==', arrWithNewPopulation, arrWithNewPopulation[0]);
         expect(arrWithNewPopulation.length).toBe(1);
         expect(arrWithNewPopulation.some((el: any) => el === 'Angola')).toBe(true);
     });
@@ -111,7 +111,7 @@ describe('Tests class TableWithStates. Check, ', () => {
     });
 
     test('if app can select only EU countries:', () => {
-        const onlyEU = newTableWithStatesFromAPI.getEuStates(mockValues.states4);
+        const onlyEU = newTableWithStatesFromAPI.selectStatesByBlock(mockValues.states4, 'EU');
         tableWithStatesEU = new TableWithStatesEU(onlyEU);
         // console.log('====po selekcji, tylko UE:', onlyEU);
         // console.log('====państwa przekazane do nowej instancji:', tableWithStatesEU.states);
