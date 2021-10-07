@@ -1,84 +1,65 @@
 import { TableWithStates, StorageBrowser } from './index';
-import { mockValues } from './mocks'
+import { mockValues } from './mocks';
+import { MS_IN_6DAYS } from './config';
 
 let newTableWithStatesFromAPI: any = null;
 let newStorage: any = null;
-let fromStorage: any = null;
-let fromAPI: any = null;
-let downloadFromApiAgain: string = '';
 
-function mockFunc(): void {
-    newTableWithStatesFromAPI.init = (): void => {
-        if(downloadFromApiAgain === 'storage' && newStorage.getStorage('states').length > 0) {
-            return fromStorage;
-        } else {
-            return fromAPI;
-        }
-    }
-}
-
-describe('Scenario:', () => {
+describe(`Different scenarios of app's init:`, () => {
     beforeEach( async() => {
         newTableWithStatesFromAPI = new TableWithStates();
         newStorage = new StorageBrowser();
-
-        fromStorage = newStorage.getStorage('states');
-        newTableWithStatesFromAPI.downloadFromAPI = () => mockValues.states1;
-        fromAPI = newTableWithStatesFromAPI.downloadFromAPI();
-        mockFunc()
     });
-
-    afterEach(() => {
-        newTableWithStatesFromAPI = null;
-        newStorage = null;
-        fromAPI = null;
-        fromStorage = null;
-    });
-
-    test('1. simulate first start, local storage is empty (app have to use API)', () => {
-        let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--scen1======',init);
-        // console.log('=====local--scen1======',newStorage.getStorage('states'));
-        expect(fromStorage).toEqual(null);
-        expect(init.length).toEqual(3);
-    })
-})
-
-describe('Next scenarios:', () => {
-    beforeEach( async() => {
-        newTableWithStatesFromAPI = new TableWithStates();
-        newStorage = new StorageBrowser();
-
-        newStorage.saveStorage('states', mockValues.states2);
-        fromStorage = newStorage.getStorage('states');
-        newTableWithStatesFromAPI.downloadFromAPI = () => mockValues.states1;
-        fromAPI = newTableWithStatesFromAPI.downloadFromAPI();
-        mockFunc()
-    })
 
     afterEach( () => {
         newTableWithStatesFromAPI = null;
         newStorage = null;
-        fromAPI = null;
-        fromStorage = null;
-    })
+    });
 
-    test('2. simulate start with using API (there are states in local storage, but these are old data)', () => {
-        downloadFromApiAgain = 'api';
-        let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--scen2======',init);
-        // console.log('=====local--scen2======',newStorage.getStorage('states'));
-        expect(init.length).toEqual(3);
-        expect(init[1].alpha3Code).toEqual('RWA');
-    })
+    test('- simulate first start, local storage is empty (app have to use API)', () => {
+        newStorage.getStorage('states');
+        newStorage.getStorage('date');
+        // console.log('flaga ze stora',newTableWithStatesFromAPI.downloadFromApiAgain(newStorage.getStorage('date')), ' długość tablicy w store ', newStorage.getStorage('states'))
+        
+        newTableWithStatesFromAPI.downloadFromAPI = jest.fn()
+        newTableWithStatesFromAPI.getEuStates = jest.fn()
+        
+        newTableWithStatesFromAPI.init();
 
-    test('3. simulate start with using local storage (there are states in local storage and these data are quite new)', () => {
-        downloadFromApiAgain = 'storage';
-        let init = newTableWithStatesFromAPI.init();
-        // console.log('=====init--scen3======',init );
-        // console.log('=====local--scen3======',newStorage.getStorage('states'));
-        expect(init.length).toEqual(2);
-        expect(init[0].alpha3Code).toEqual('MON');
-        expect(init[1].population).toEqual(49000);
-    })
+        expect(newTableWithStatesFromAPI.downloadFromAPI).toBeCalledTimes(1)
+        expect(newTableWithStatesFromAPI.getEuStates).not.toBeCalled()
+        expect(newTableWithStatesFromAPI.getEuStates).toBeCalledTimes(0)
+        // expect(newTableWithStatesFromAPI.tableStatesFromApi.length).toEqual(3);
+        // expect(newTableWithStatesFromAPI.tableStatesFromApi.some((el: any) => el.name === 'Angola')).toBe(true);
+    });
+
+    test('- simulate start with using local storage (there are states in local storage and these data are quite new)', () => {
+        newStorage.saveStorage('states', mockValues.states2);
+        newStorage.saveStorage('date', ((new Date).getTime() - 10*1000));
+        // console.log('flaga ze stora',newTableWithStatesFromAPI.downloadFromApiAgain(newStorage.getStorage('date')), ' długość tablicy w store ', newStorage.getStorage('states').length)
+        
+        newTableWithStatesFromAPI.downloadFromAPI = jest.fn()
+        newTableWithStatesFromAPI.getEuStates = jest.fn()
+
+        newTableWithStatesFromAPI.init();
+
+        expect(newTableWithStatesFromAPI.downloadFromAPI).toBeCalledTimes(0)
+        expect(newTableWithStatesFromAPI.getEuStates).toBeCalledTimes(1)
+        expect(newTableWithStatesFromAPI.downloadFromAPI).not.toBeCalled()
+    });
+
+    test('- simulate start with using API (there are states in local storage, but these are old data)', () => {
+        newStorage.saveStorage('states', mockValues.states2);
+        newStorage.saveStorage('date', ((new Date).getTime() - MS_IN_6DAYS));
+        // console.log('flaga ze stora',newTableWithStatesFromAPI.downloadFromApiAgain(newStorage.getStorage('date')), ' długość tablicy w store ', newStorage.getStorage('states').length)
+        
+        newTableWithStatesFromAPI.downloadFromAPI = jest.fn()
+        newTableWithStatesFromAPI.getEuStates = jest.fn()
+
+        newTableWithStatesFromAPI.init();
+
+        expect(newTableWithStatesFromAPI.downloadFromAPI).toBeCalledTimes(1)
+        expect(newTableWithStatesFromAPI.getEuStates).toBeCalledTimes(0)
+        expect(newTableWithStatesFromAPI.getEuStates).not.toBeCalled()
+    });
 })

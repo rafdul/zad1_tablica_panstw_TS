@@ -68,7 +68,7 @@ export class TableWithStates {
         }
 
         this.useStorage(this.tableStatesFromApi, this.dateDownloadFromApi);
-        
+                    
         this.getEuStates(this.tableStatesFromApi);
     }
 

@@ -29,21 +29,7 @@ describe('Tests class TableWithStates. Check,', () => {
         expect(newTableWithStatesFromAPI).toBeInstanceOf(TableWithStates);
     });
 
-
-    test('if data from API are transfered to other methods (storage is empty)', () => {
-        let dataFromAPI = mockValues.states0;
-        newTableWithStatesFromAPI.getEuStates = jest.fn();
-        newTableWithStatesFromAPI.useStorage = jest.fn();
-        newTableWithStatesFromAPI.infoAboutChangingPopulation = jest.fn();
-
-        newTableWithStatesFromAPI.transferDataFromAPI(dataFromAPI)
-
-        expect(newTableWithStatesFromAPI.getEuStates).toHaveBeenCalledTimes(1);
-        expect(newTableWithStatesFromAPI.useStorage).toHaveBeenCalledTimes(1);
-        expect(newTableWithStatesFromAPI.infoAboutChangingPopulation).toHaveBeenCalledTimes(0);
-    });
-
-    test('if data from API are transfered to other methods (there are data in storage)', () => {
+    test('if function infoAboutChangingPopulation is called when there are data in storage', () => {
         let dataFromAPI = mockValues.states0;
         newStorage.saveStorage('states', dataFromAPI)
         newTableWithStatesFromAPI.infoAboutChangingPopulation = jest.fn();
@@ -236,6 +222,7 @@ describe('Tests class TableWithStatesEU. Check,', () => {
             let diff2 = (testStates[3].density) - (testStates[2].density);
             expect(diff1).toBeGreaterThan(0);
             expect(diff2).toBeLessThan(0);
+                              
         }
     });
 
