@@ -1,4 +1,5 @@
-import { TableWithStates, StorageBrowser } from './index';
+import { TableWithStates } from './tableWithStates';
+import { StorageBrowser } from './storage';
 import { mockValues } from './mocks';
 import { MS_IN_6DAYS } from './config';
 

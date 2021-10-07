@@ -1,16 +1,6 @@
-import {MS_IN_6DAYS} from './config'
+import { MS_IN_6DAYS, TabWithStates } from './config'
 
 const timeNow: number = (new Date).getTime();
-
-export interface TabWithStates {
-    name: string,
-    population: number,
-    area?: number,
-    density?: number,
-    id?: number,
-    alpha3Code?: string,
-    regionalBlocs: Array<{acronym: string}>
-};
 
 interface Values {
     states0: Array<TabWithStates>,

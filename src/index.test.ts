@@ -1,5 +1,8 @@
-import { TableWithStates, StorageBrowser, TableWithStatesEU } from './index';
-import { mockValues, TabWithStates } from './mocks'
+import { TableWithStates } from './tableWithStates';
+import { StorageBrowser } from './storage';
+import { TableWithStatesEU } from './tableWithStatesEU';
+import { mockValues } from './mocks'
+import { TabWithStates } from './config';
 
 let newTableWithStatesFromAPI: any = null;
 let newStorage: any = null;

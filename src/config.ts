@@ -28,6 +28,8 @@ export interface TabWithStates {
     population: number,
     area?: number,
     density?: number,
+    id?: number,
+    alpha3Code?: string,
     regionalBlocs: Array<{acronym: string}>
 };
 
