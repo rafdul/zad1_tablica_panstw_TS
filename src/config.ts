@@ -19,7 +19,7 @@ interface Texts {
         compareStates: {showTable: string},
         removeLetterA: {showTable: string},
         sortByDensity: {showTable: string},
-        countPopulationForAFewStatesEu: {info: string, moreThan: string, lessThan: string},
+        countEUPopulation: {prelude: string, moreThan: string, lessThan: string, infoAboutStates: string},
     }
 };
 
@@ -78,10 +78,11 @@ export var logsTexts: Texts = {
         sortByDensity: {
             showTable: '',
         },
-        countPopulationForAFewStatesEu: {
-            info: ' najgęściej zaludnionych państw UE to: ',
-            moreThan: 'Łączna liczba ludności w 5 najgęściej zaludnionych państwach UE jest większa od 500 mln i wynosi ',
-            lessThan: 'Łączna liczba ludności w 5 najgęściej zaludnionych państwach UE jest mniejsza od 500 mln i wynosi ',
+        countEUPopulation: {
+            prelude: 'Łączna liczba ludności w ',
+            moreThan: 'najgęściej zaludnionych państwach UE jest większa od 500 mln i wynosi ',
+            lessThan: 'najgęściej zaludnionych państwach UE jest mniejsza od 500 mln i wynosi ',
+            infoAboutStates: '- te państwa to:',
         },
     },
 }

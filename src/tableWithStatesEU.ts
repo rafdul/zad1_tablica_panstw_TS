@@ -1,19 +1,19 @@
 import { TabWithStates, logsTexts } from './config'
 
 export class TableWithStatesEU {
-    private states: Array<TabWithStates>;
-    private tableStatesWithoutLetterA: Array<TabWithStates> = [];
+    states: Array<TabWithStates>;
+    tableStatesWithoutIndicatedLetter: Array<TabWithStates> = [];
 
     constructor(states: Array<TabWithStates>) {
         this.states = states;
     }
 
     init() {
-        this.addDensityAndSort(this.states);
+        this.addDensity(this.states);
     }
 
     // dodaj gęstość zaludnienia
-    addDensityAndSort(tableStates:  Array<TabWithStates>): void {        
+    addDensity(tableStates:  Array<TabWithStates>): void {        
         tableStates.forEach(item => {
             if(item.population != undefined && item.area != undefined) {
                 item.density = parseFloat((item.population / item.area).toFixed(2));
@@ -21,12 +21,12 @@ export class TableWithStatesEU {
         });
 
         this.compareStates(tableStates, 'density')
-        this.removeLetterA(tableStates, 'a');
-        this.countPopulationForAFewStatesEu(tableStates, 5);
+        this.removeLetterFromName(tableStates, 'a');
+        this.countEUPopulation(tableStates, 5);
     }
 
     // sortowanie państw wg jakiegoś kryterium (keyBySort)
-    compareStates(tableWithStates:Array<TabWithStates>, keyBySort:string): Array<TabWithStates> {
+    compareStates(tableWithStates:Array<TabWithStates>, keyBySort:string): void {
         function compare(a:any, b:any): number  {
             if(typeof a[keyBySort] === 'number' && typeof b[keyBySort] === 'number') {
                 if (a[keyBySort] > b[keyBySort]) {
@@ -38,33 +38,31 @@ export class TableWithStatesEU {
 
         tableWithStates.sort(compare)
         console.log(logsTexts.tableWithStatesEU.compareStates.showTable, tableWithStates)
-        return tableWithStates;
     }
 
     // usunąć państwa posiadające literę A lub a
-    removeLetterA(tableWithStates: Array<TabWithStates>, letter: string): Array<TabWithStates> {
+    removeLetterFromName(tableWithStates: Array<TabWithStates>, letter: string): void {
         tableWithStates.forEach( item => {
-            if( !(item.name).toLowerCase().includes(letter) ) this.tableStatesWithoutLetterA.push(item);
+            if( !(item.name).toLowerCase().includes(letter) ) this.tableStatesWithoutIndicatedLetter.push(item);
         })
 
-        console.log(logsTexts.tableWithStatesEU.removeLetterA.showTable, this.tableStatesWithoutLetterA);
-        return this.tableStatesWithoutLetterA;
+        console.log(logsTexts.tableWithStatesEU.removeLetterA.showTable, this.tableStatesWithoutIndicatedLetter);
     }
 
     // suma populacji 5 najgęściej zaludnionych państw i oblicz, czy jest większa od 500 milionów
-    countPopulationForAFewStatesEu(tableWithStates:Array<TabWithStates>, amountStates: number): number {
+    countEUPopulation(tableWithStates:Array<TabWithStates>, amountStates: number): void {
         const onlyTopStates = tableWithStates.slice(0,amountStates);
         const nameTopStates: string[] = onlyTopStates.map(el => el.name);
         const sumOfPopulation: number = onlyTopStates.reduce( (a,b) => a + b.population, 0)
 
-        console.log(amountStates + logsTexts.tableWithStatesEU.countPopulationForAFewStatesEu.info + nameTopStates.join(', '))
+        // console.log(amountStates + logsTexts.tableWithStatesEU.countEUPopulation.info + nameTopStates.join(', '))
 
         if(sumOfPopulation > 500000000) {
-            console.log(logsTexts.tableWithStatesEU.countPopulationForAFewStatesEu.moreThan, sumOfPopulation.toString());
+            return console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates, logsTexts.tableWithStatesEU.countEUPopulation.moreThan, sumOfPopulation.toString(), logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates, nameTopStates.join(', '));
         } else {
-            console.log(logsTexts.tableWithStatesEU.countPopulationForAFewStatesEu.lessThan, sumOfPopulation.toString()); 
+            return console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates, logsTexts.tableWithStatesEU.countEUPopulation.lessThan, sumOfPopulation.toString(), logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates, nameTopStates.join(', '));
         }
 
-        return sumOfPopulation;
+        // return sumOfPopulation;
     }
 }
