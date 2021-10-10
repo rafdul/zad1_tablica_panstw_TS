@@ -55,14 +55,10 @@ export class TableWithStatesEU {
         const nameTopStates: string[] = onlyTopStates.map(el => el.name);
         const sumOfPopulation: number = onlyTopStates.reduce( (a,b) => a + b.population, 0)
 
-        // console.log(amountStates + logsTexts.tableWithStatesEU.countEUPopulation.info + nameTopStates.join(', '))
-
         if(sumOfPopulation > 500000000) {
-            return console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates, logsTexts.tableWithStatesEU.countEUPopulation.moreThan, sumOfPopulation.toString(), logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates, nameTopStates.join(', '));
+            return console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates + logsTexts.tableWithStatesEU.countEUPopulation.moreThan + sumOfPopulation.toString() + logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates + nameTopStates.join(', '));
         } else {
-            return console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates, logsTexts.tableWithStatesEU.countEUPopulation.lessThan, sumOfPopulation.toString(), logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates, nameTopStates.join(', '));
+            return console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates + logsTexts.tableWithStatesEU.countEUPopulation.lessThan + sumOfPopulation.toString() + logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates + nameTopStates.join(', '));
         }
-
-        // return sumOfPopulation;
     }
 }

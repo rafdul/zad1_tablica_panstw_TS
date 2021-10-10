@@ -2,26 +2,14 @@
 export const MS_IN_6DAYS: number = 30*1000; // wartość do testów
 export const apiUrl: string = 'https://restcountries.com/v2/all';
 
+
 interface Texts {
-    tableWithStates: {
-        init: {getFromStorage: string, dataInStorage: string, connectWithApi: string},
-        downloadFromAPI: {success: string, failure: string},
-        downloadFromApiAgain: {useDataFromStorage: string, useDataFromApi: string},
-        countTimeFromLastApi: {timeFromLastApi: string},
-        infoAboutChangingPopulation: {stateWithChangedPopulation: string, noChangeOfPopulation: string},
-        getEuStates: {showTable: string},
-    },
-    storage: {
-        saveStorage: {failure: string},
-        getStorage: {failure: string},
-    },
-    tableWithStatesEU: {
-        compareStates: {showTable: string},
-        removeLetterA: {showTable: string},
-        sortByDensity: {showTable: string},
-        countEUPopulation: {prelude: string, moreThan: string, lessThan: string, infoAboutStates: string},
+    [key: string]: {
+        [key: string]: {
+            [key: string]: string,
+        }
     }
-};
+}
 
 export interface TabWithStates {
     name: string,
@@ -80,9 +68,9 @@ export var logsTexts: Texts = {
         },
         countEUPopulation: {
             prelude: 'Łączna liczba ludności w ',
-            moreThan: 'najgęściej zaludnionych państwach UE jest większa od 500 mln i wynosi ',
-            lessThan: 'najgęściej zaludnionych państwach UE jest mniejsza od 500 mln i wynosi ',
-            infoAboutStates: '- te państwa to:',
+            moreThan: ' najgęściej zaludnionych państwach UE jest większa od 500 mln i wynosi ',
+            lessThan: ' najgęściej zaludnionych państwach UE jest mniejsza od 500 mln i wynosi ',
+            infoAboutStates: ' - te państwa to: ',
         },
     },
 }

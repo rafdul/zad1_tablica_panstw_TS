@@ -2,7 +2,7 @@ import { TableWithStates } from './tableWithStates';
 import { StorageBrowser } from './storage';
 import { TableWithStatesEU } from './tableWithStatesEU';
 import { mockValues } from './mocks'
-import { TabWithStates } from './config';
+import { TabWithStates, logsTexts } from './config';
 
 let newTableWithStatesFromAPI: any = null;
 let newStorage: any = null;
@@ -231,28 +231,40 @@ describe('Tests class TableWithStatesEU. Check,', () => {
         expect(withoutLetter.every((el: any) => el.name.includes('m') === false)).toBe(true);
     });
 
-    test('if app can sum population of countries', () => {
+    // test('if app can sum population of countries', () => {
+    //     const testStates = mockValues.statesWithPopulation;
+    //     const testStatesPopulationTop2 = 21052338;
+    //     const testStatesPopulationTop3 = 38493477;
+
+    //     let resTop2 = tableWithStatesEU.countEUPopulation(testStates, 2);
+    //     let resTop3 = tableWithStatesEU.countEUPopulation(testStates, 3)
+
+    //     expect(resTop2).toEqual(testStatesPopulationTop2);
+    //     expect(resTop3).toEqual(testStatesPopulationTop3);
+    //     expect(resTop2).toBeLessThan(resTop3);
+    // });
+
+
+
+    test('if app called correct information in console.log when sum of pupulation less than 50M', () => {
         const testStates = mockValues.statesWithPopulation;
-        const testStatesPopulationTop2 = 21052338;
-        const testStatesPopulationTop3 = 38493477;
+        const testStatesPopulationTop2 = 28140035;
+        const expectedText = logsTexts.tableWithStatesEU.countEUPopulation.prelude + 2 + logsTexts.tableWithStatesEU.countEUPopulation.lessThan + testStatesPopulationTop2.toString() + logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates + 'Netherlands, Czech Republic'
+        console.log = jest.fn();
 
-        let resTop2 = tableWithStatesEU.countEUPopulation(testStates, 2);
-        let resTop3 = tableWithStatesEU.countEUPopulation(testStates, 3)
+        tableWithStatesEU.countEUPopulation(testStates, 2);
 
-        expect(resTop2).toEqual(testStatesPopulationTop2);
-        expect(resTop3).toEqual(testStatesPopulationTop3);
-        expect(resTop2).toBeLessThan(resTop3);
+        expect(console.log).toHaveBeenCalledWith(expectedText);
     });
 
-    // test('if app called correct information in console.log when sum of pupulation less than 50M', () => {
-    //     const testStates = mockValues.statesWithPopulation;
-    //     const consoleSpy = jest.spyOn(console, 'log');
-    //     console.log('hello');
-    //     expect(consoleSpy).toHaveBeenCalledWith('hello');
-    //     console.log('===============consoleSpy=======', consoleSpy)
+    test('if app called correct information in console.log when sum of pupulation more than 500M', () => {
+        const testStates = mockValues.statesWithPopulation;
+        const testStatesPopulationTop3 = 1399090837;
+        const expectedText = logsTexts.tableWithStatesEU.countEUPopulation.prelude + 3 + logsTexts.tableWithStatesEU.countEUPopulation.moreThan + testStatesPopulationTop3.toString() + logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates + 'Netherlands, Czech Republic, China'
+        console.log = jest.fn();
 
-    //     // tableWithStatesEU.countEUPopulation(testStates, 2);
-    //     // console.log('++++++++++res++++++++++', console.log)
-
-    // });
+        tableWithStatesEU.countEUPopulation(testStates, 3);
+        
+        expect(console.log).toHaveBeenCalledWith(expectedText)
+    });
 })
