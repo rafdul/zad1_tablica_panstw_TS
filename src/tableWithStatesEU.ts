@@ -1,14 +1,15 @@
 import { TabWithStates, logsTexts } from './config'
 
 export class TableWithStatesEU {
-    states: Array<TabWithStates>;
+    states: Array<TabWithStates> = [];
     tableStatesWithoutIndicatedLetter: Array<TabWithStates> = [];
 
-    constructor(states: Array<TabWithStates>) {
-        this.states = states;
-    }
+    // constructor(states: Array<TabWithStates>) {
+    //     this.states = states;
+    // }
 
-    init() {
+    init(data: Array<TabWithStates>): void {
+        this.states = data;
         this.addDensity(this.states);
     }
 
@@ -62,3 +63,5 @@ export class TableWithStatesEU {
         }
     }
 }
+
+export const tableWithStatesEU = new TableWithStatesEU();

@@ -1,6 +1,6 @@
 import { TabWithStates, logsTexts, MS_IN_6DAYS, apiUrl } from './config'
 import { storage } from './storage';
-import { TableWithStatesEU } from './tableWithStatesEU';
+import { tableWithStatesEU } from './tableWithStatesEU';
 
 export class TableWithStates {
 
@@ -122,8 +122,8 @@ export class TableWithStates {
         
         console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
 
-        const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
-        tableWithStatesEU.init();
+        // const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
+        tableWithStatesEU.init(onlyStatesEU);
         
         return onlyStatesEU;
     }

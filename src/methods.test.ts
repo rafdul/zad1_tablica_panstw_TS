@@ -115,7 +115,8 @@ describe('Tests class TableWithStates. Check, ', () => {
 
     test('if app can select only EU countries:', () => {
         const onlyEU = newTableWithStatesFromAPI.selectStatesByBlock(mockValues.states4, 'EU');
-        tableWithStatesEU = new TableWithStatesEU(onlyEU);
+        tableWithStatesEU = new TableWithStatesEU();
+        tableWithStatesEU.init(onlyEU)
         // console.log('====po selekcji, tylko UE:', onlyEU);
         // console.log('====państwa przekazane do nowej instancji:', tableWithStatesEU.states);
 
@@ -185,34 +186,30 @@ describe('Tests class StorageBrowser. Check,', () => {
 
 // tests for class TableWithStatesEU 
 describe('Tests class TableWithStatesEU. Check,', () => {
-    let statesEU: [] | Array<TabWithStates> = [];
 
     beforeEach(() => {
-        tableWithStatesEU = new TableWithStatesEU(mockValues.states4);
-        statesEU = tableWithStatesEU.states;
+        tableWithStatesEU = new TableWithStatesEU();
     });
 
     afterEach(() => {
         tableWithStatesEU = null;
-        statesEU = [];
     });
 
     test('if new object is created as instance of TableWithStatesEU ', () => {
         expect(tableWithStatesEU).toBeInstanceOf(TableWithStatesEU);
-        // console.log(tableWithStatesEU)
+        // console.log('------------------------',tableWithStatesEU)
     });
 
     test('if density is added', () => {
-        tableWithStatesEU.addDensity(statesEU);
+        tableWithStatesEU.init(mockValues.states4);
 
-        expect(statesEU.filter((el: any) => !el.density)).toStrictEqual([]);
-        expect(typeof statesEU[2].density).toBe('number');
-        expect(statesEU[2].density).toBeGreaterThan(0);
+        expect(tableWithStatesEU.states.filter((el: any) => !el.density)).toStrictEqual([]);
+        expect(typeof tableWithStatesEU.states[2].density).toBe('number');
+        expect(tableWithStatesEU.states[2].density).toBeGreaterThan(0);
     });
 
     test('if states were sorted by density', () => {
-        tableWithStatesEU.compareStates(statesEU, 'density');
-        // console.log('============tableWithStatesEU.states======', tableWithStatesEU.states)
+        tableWithStatesEU.init(mockValues.states4);
        
         expect(tableWithStatesEU.states.length).toEqual(6);
         expect(tableWithStatesEU.states[0].name).toEqual('Malta');
@@ -230,21 +227,6 @@ describe('Tests class TableWithStatesEU. Check,', () => {
         // expect(withoutLetter.some((el: any) => el.name === 'Kenia')).toBe(true);
         expect(withoutLetter.every((el: any) => el.name.includes('m') === false)).toBe(true);
     });
-
-    // test('if app can sum population of countries', () => {
-    //     const testStates = mockValues.statesWithPopulation;
-    //     const testStatesPopulationTop2 = 21052338;
-    //     const testStatesPopulationTop3 = 38493477;
-
-    //     let resTop2 = tableWithStatesEU.countEUPopulation(testStates, 2);
-    //     let resTop3 = tableWithStatesEU.countEUPopulation(testStates, 3)
-
-    //     expect(resTop2).toEqual(testStatesPopulationTop2);
-    //     expect(resTop3).toEqual(testStatesPopulationTop3);
-    //     expect(resTop2).toBeLessThan(resTop3);
-    // });
-
-
 
     test('if app called correct information in console.log when sum of pupulation less than 50M', () => {
         const testStates = mockValues.statesWithPopulation;
@@ -264,7 +246,7 @@ describe('Tests class TableWithStatesEU. Check,', () => {
         console.log = jest.fn();
 
         tableWithStatesEU.countEUPopulation(testStates, 3);
-        
+
         expect(console.log).toHaveBeenCalledWith(expectedText)
     });
 })
