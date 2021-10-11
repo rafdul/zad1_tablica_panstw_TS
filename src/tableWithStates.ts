@@ -1,6 +1,7 @@
 import { TabWithStates, logsTexts, MS_IN_6DAYS, apiUrl } from './config'
-import { storage } from './storage';
 import { tableWithStatesEU } from './tableWithStatesEU';
+import { storage } from './storage';
+import { startRegionalbloc } from './tableRegionalBloc';
 
 export class TableWithStates {
 
@@ -13,6 +14,7 @@ export class TableWithStates {
             console.log(logsTexts.tableWithStates.init.getFromStorage, storage.getStorage('states').length);
             console.log(logsTexts.tableWithStates.init.dataInStorage, storage.getStorage('states'));
             this.selectStatesByBlock(storage.getStorage('states'), 'EU');
+            this.createRegionalBlocs(storage.getStorage('states'));
         } else {
             console.log(logsTexts.tableWithStates.init.connectWithApi);
             this.downloadFromAPI();
@@ -42,6 +44,8 @@ export class TableWithStates {
         this.useStorage(dataFromAPI, this.dateDownloadFromApi);
                 
         this.selectStatesByBlock(dataFromAPI, 'EU');
+
+        this.createRegionalBlocs(dataFromAPI);
     }
 
     useStorage(dataFromAPI: Array<TabWithStates>, dateDownload: number): void {
@@ -116,16 +120,19 @@ export class TableWithStates {
             }
         });
 
-        /* metoda korzystająca ze słownika zawierającego faktycznych członków UE */
-        // const nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
-        // onlyStatesEU = allStates.filter(el => nameStatesFromEU.includes(el.name.toLowerCase()));
+        /* metoda korzystająca ze słownika zawierającego faktycznych członków UE 
+        const nameStatesFromEU: Array<string> = ['austria', 'belgium', 'bulgaria', 'croatia', 'cyprus', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france', 'germany', 'greece', 'hungary', 'ireland', 'italy', 'latvia', 'lithuania', 'luxembourg', 'malta', 'netherlands', 'poland', 'portugal', 'romania', 'slovakia', 'slovenia', 'spain', 'sweden']
+        onlyStatesEU = allStates.filter(el => nameStatesFromEU.includes(el.name.toLowerCase()));*/
         
-        console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
+        // console.log(logsTexts.tableWithStates.getEuStates.showTable, onlyStatesEU);
 
-        // const tableWithStatesEU = new TableWithStatesEU(onlyStatesEU);
         tableWithStatesEU.init(onlyStatesEU);
         
         return onlyStatesEU;
+    }
+
+    createRegionalBlocs(dataFromAPI: Array<TabWithStates>): void {
+        startRegionalbloc(dataFromAPI);
     }
 }
 

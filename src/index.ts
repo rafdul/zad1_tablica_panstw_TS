@@ -24,9 +24,13 @@
 **/
 
 import { tableWithStates } from './tableWithStates';
+// import { startRegionalbloc } from './tableRegionalBloc';
+
 
 window.onload = function() {
     console.log('App started!');
 
     tableWithStates.init();
+
+    // startRegionalbloc(tableWithStates.statesFromApi)
 }

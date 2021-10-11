@@ -18,7 +18,8 @@ export interface TabWithStates {
     density?: number,
     id?: number,
     alpha3Code?: string,
-    regionalBlocs: Array<{acronym: string}>
+    regionalBlocs: Array<{acronym: string}>,
+    nativeName?: string,
 };
 
 // zmienna zawierająca bibliotekę komunikatów w konsoli

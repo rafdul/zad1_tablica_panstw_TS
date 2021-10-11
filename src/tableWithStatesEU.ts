@@ -4,10 +4,6 @@ export class TableWithStatesEU {
     states: Array<TabWithStates> = [];
     tableStatesWithoutIndicatedLetter: Array<TabWithStates> = [];
 
-    // constructor(states: Array<TabWithStates>) {
-    //     this.states = states;
-    // }
-
     init(data: Array<TabWithStates>): void {
         this.states = data;
         this.addDensity(this.states);
