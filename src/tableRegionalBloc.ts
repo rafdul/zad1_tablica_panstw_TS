@@ -1,7 +1,7 @@
 import { TabWithStates } from './config'
 
 export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
-    console.log('ODPALENIE FUNKCJI tableRegionalBloc ');
+    console.log('START danych dla bloków regionalnych');
 
     interface RegBlocInfo {
         countries: Array<string>,
@@ -114,7 +114,7 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
                     }
                 })
             } else {
-                console.log(`${el.name} nie posiada we właściwościach tablicy walut`);
+                console.log(`${el.name} nie posiada informacji o walutach`);
             }
         });
     }
@@ -157,15 +157,95 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
         getSumPopulation(otherBlock, 'other');
     }
 
+    // dodawanie informacji o językach
+    const getLanguages = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other') => {
+        let stringToObj = makeReferenceToObj(nameBlock);
+
+        stateInRegionalBloc.forEach(singleState => {
+            if(Array.isArray(singleState.languages)) {
+                singleState.languages.forEach(singleLanguage => {
+                    
+                    if(stringToObj != undefined && stringToObj[singleLanguage.iso639_1]) {
+                        addDataToObjLanguage(nameBlock, singleState, singleLanguage.iso639_1, true);
+                    } else if(stringToObj != undefined) {
+                        createObjLanguage(nameBlock, singleLanguage.iso639_1);
+                        addDataToObjLanguage(nameBlock, singleState, singleLanguage.iso639_1);
+                    }
+
+                });
+            } else {
+                console.log(`${singleState.name} nie posiada informacji o językach`);
+            }
+        });
+    }
+
+    const startGetLanguages = () => {
+        getLanguages(euBlock, 'EU');
+        getLanguages(auBlock, 'AU');
+        getLanguages(naftaBlock, 'NAFTA');
+        getLanguages(otherBlock, 'other');
+    }
+
+    // generowanie dostępu do obiektu languages w obiektach dla poszczególnych bloków regionalnych
+    const makeReferenceToObj = (nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other') => {
+        switch(nameBlock) {
+            case 'EU':
+                return regionalBlocs.EU.languages;
+            case 'AU':
+                return regionalBlocs.AU.languages;
+            case 'NAFTA':
+                return regionalBlocs.NAFTA.languages;
+            case 'other':
+                return regionalBlocs.other.languages;
+            default:
+                console.log('Błędny argument nameBlock.');
+        }
+    }
+
+    // tworzenie pustego obiektu w languages (key to kod języka)
+    const createObjLanguage = (nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other', codeLang: string) => {
+        let stringToObj = makeReferenceToObj(nameBlock);
+
+        if(stringToObj != undefined) {
+            stringToObj[codeLang] = {
+                countries: [],
+                name: '',
+                population: 0,
+                area: 0
+            }
+        }
+    }
+
+    // dodawanie danych do obiektu danego języka w languages
+    const addDataToObjLanguage = (nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other', country: TabWithStates, codeLang: string, langExist: boolean = false) => {
+        let stringToObj = makeReferenceToObj(nameBlock);
+
+        if(stringToObj != undefined) {
+            if(country.alpha3Code) stringToObj[codeLang].countries.push(country.alpha3Code);
+            if(country.population) stringToObj[codeLang].population += country.population;
+            if(country.area) stringToObj[codeLang].area += country.area;      
+            if(langExist) {
+                if(country.nativeName) stringToObj[codeLang].name += `, ${country.nativeName}`;
+            } else {
+                if(country.nativeName) stringToObj[codeLang].name += country.nativeName;
+            }
+        }
+    }
+
+    
+
+
     
     // kolejnosć wywoływania funkcji
     getRegionalArray(dataFromApi);
     startGetNativeName();
     startGetCurrencies();
     startGetSumPopulation();
+    startGetLanguages();
+
 
     const showConsole = () => {
-        console.log('tablice z blokami :', [euBlock, auBlock, naftaBlock, otherBlock]);
+        // console.log('tablice z blokami :', [euBlock, auBlock, naftaBlock, otherBlock]);
         console.log('Nowy obiekt z nativeName: ', regionalBlocs);
     }
     showConsole();

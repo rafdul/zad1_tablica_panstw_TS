@@ -21,6 +21,7 @@ export interface TabWithStates {
     regionalBlocs?: Array<{acronym: string}>,
     nativeName?: string,
     currencies?: Array<{code: string, name: string, symbol: string}>,
+    languages?: Array<{iso639_1: string, iso639_2: string, name: string, nativeName: string}>,
 };
 
 // zmienna zawierająca bibliotekę komunikatów w konsoli
