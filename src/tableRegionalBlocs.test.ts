@@ -1,6 +1,5 @@
 import { startRegionalbloc } from './tableRegionalBloc';
 import { mockValues } from './mocks';
-import { TabWithStates } from './config'
 
 describe('Check, if new object with regional blocs is created and:' , () => {
 
@@ -24,11 +23,28 @@ describe('Check, if new object with regional blocs is created and:' , () => {
 
     test(`check, if countries' populations are summed`, () => {
         let testRegBloc = startRegionalbloc(mockValues.statesForNewObj);
-        console.log('==test3==', testRegBloc);
+        // console.log('==test3==', testRegBloc);
         let populationForNafta = 132322035;
         let populationForOther = 1153261217;
 
         expect(testRegBloc.NAFTA.population).toEqual(populationForNafta);
         expect(testRegBloc.other.population).toEqual(populationForOther);
     });
+
+    test(`check, if countries' languages are added to object languages`, () => {
+        let testRegBloc = startRegionalbloc(mockValues.statesForNewObj);
+        // console.log('==test3==', testRegBloc);
+        let testArray = [];
+        for(const key in testRegBloc.NAFTA.languages) {
+            testArray.push(key)
+        }
+        
+        let resultObj: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(testRegBloc.NAFTA.languages, "fr");
+        // console.log('==test4==', resultObj && resultObj.value);
+        
+        expect(testArray.length).toEqual(3);
+        expect(resultObj && resultObj.value.countries).toEqual(['CAN', 'MEX']);
+        expect(resultObj && resultObj.value.population).toEqual(132322035);
+        expect(resultObj && resultObj.value.name).toEqual('kanadassssss, meksyksssss');
+    })
 });
