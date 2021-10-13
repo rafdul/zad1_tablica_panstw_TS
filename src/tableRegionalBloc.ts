@@ -4,10 +4,10 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
     console.log('START danych dla bloków regionalnych');
 
     const regionalBlocs: tabRegBloc = {
-        EU: { countries: [], population: 0, languages: {}, currencies: [] },
-        NAFTA: { countries: [], population: 0, languages: {}, currencies: [] },
-        AU: { countries: [], population: 0, languages: {}, currencies: [] },
-        other: { countries: [], population: 0, languages: {}, currencies: [] },
+        EU: { countries: [], population: 0, languages: {}, currencies: [], area: 0, density: 0 },
+        NAFTA: { countries: [], population: 0, languages: {}, currencies: [], area: 0, density: 0 },
+        AU: { countries: [], population: 0, languages: {}, currencies: [], area: 0, density: 0 },
+        other: { countries: [], population: 0, languages: {}, currencies: [], area: 0, density: 0 },
     };
 
     const euBlock: Array<TabWithStates> = [];
@@ -63,11 +63,19 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
         });
     }
 
-    // dodawanie populacji państw
+    // dodawanie populacji państw w ramach bloków
     const getSumPopulation = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
         stateInRegionalBloc.forEach(el => {
             if(typeof el.population === 'number' && nameBlock != undefined)
                 regionalBlocs[nameBlock].population += el.population;                
+        });
+    }
+
+    // dodawanie powierzchni państw w ramach bloków
+    const getSumArea = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
+        stateInRegionalBloc.forEach(el => {
+            if(typeof el.area === 'number' && nameBlock != undefined)
+                regionalBlocs[nameBlock].area += el.area;                
         });
     }
 
@@ -123,6 +131,15 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
         }
     }
 
+    // dodawanie gęstości zaludnienia do bloków regionalnych
+    const getDensity = () => {
+        const parametersForDensity: Array<RegBlocs> = ['EU', 'AU', 'NAFTA', 'other'];
+
+        parametersForDensity.forEach( item => {
+            regionalBlocs[item].density = parseFloat((regionalBlocs[item].population / regionalBlocs[item].area).toFixed(2));
+        });
+    }
+
     // funkcja zbierająca funkcje "cząstkowe", które budują poszczególne części nowego obiektu
     const makeObjWithRegBlocs = () => {
         const parametersRegBlocs: Array<[Array<TabWithStates>, RegBlocs]> = [
@@ -133,21 +150,34 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
             getNativeName(item[0], item[1]);
             getCurrencies(item[0], item[1]);
             getSumPopulation(item[0], item[1]);
+            getSumArea(item[0], item[1]);
             getLanguages(item[0], item[1]);
-
-        })
+        });
     }
 
+    // Blok funkcji pracujących na nowym obiekcie i generujących odpowiedzi na zadane pytania
+
+
+
+    
     // konsolowanie informacji o nowym obiekcie
     const showConsole = () => {
         // console.log('tablice z blokami :', [euBlock, auBlock, naftaBlock, otherBlock]);
-        console.log('Bloki reguonalne: ', regionalBlocs);
+        console.log('Bloki regionalne: ', regionalBlocs);
     }
 
     // kolejnosć wywoływania funkcji
     getRegionalArray(dataFromApi);
     makeObjWithRegBlocs()
+    getDensity();
     showConsole();
 
     return regionalBlocs;
 }
+
+export const getInfoRegBloc = (someFunc:tabRegBloc) => {
+
+    console.log('startRegionalbloc: ', someFunc.AU)
+}
+
+

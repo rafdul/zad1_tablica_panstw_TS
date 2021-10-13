@@ -1,7 +1,7 @@
 import { TabWithStates, logsTexts, MS_IN_6DAYS, apiUrl } from './config'
 import { tableWithStatesEU } from './tableWithStatesEU';
 import { storage } from './storage';
-import { startRegionalbloc } from './tableRegionalBloc';
+import { startRegionalbloc, getInfoRegBloc } from './tableRegionalBloc';
 
 export class TableWithStates {
 
@@ -132,7 +132,8 @@ export class TableWithStates {
     }
 
     createRegionalBlocs(dataFromAPI: Array<TabWithStates>): void {
-        startRegionalbloc(dataFromAPI);
+        // startRegionalbloc(dataFromAPI);
+        getInfoRegBloc(startRegionalbloc(dataFromAPI))
     }
 }
 

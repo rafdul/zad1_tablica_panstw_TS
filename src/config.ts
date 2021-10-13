@@ -36,6 +36,8 @@ interface RegBlocInfo {
         },
     }
     currencies: Array<string>,
+    area: number,
+    density: number,
 };
 
 // export interface tabRegBloc {
