@@ -1,28 +1,9 @@
-import { TabWithStates } from './config'
+import { TabWithStates, tabRegBloc, RegBlocs } from './config'
+import { TableWithStates } from './tableWithStates';
+
 
 export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
     console.log('START danych dla bloków regionalnych');
-
-    interface RegBlocInfo {
-        countries: Array<string>,
-        population: number,
-        languages?: {
-            [key: string]: {
-                countries: Array<string>,
-                population: number,
-                area: number,
-                name: string,
-            },
-        }
-        currencies: Array<string>,
-    };
-
-    interface tabRegBloc {
-        EU: RegBlocInfo,
-        NAFTA: RegBlocInfo,
-        AU: RegBlocInfo,
-        other: RegBlocInfo,
-    }
 
     const regionalBlocs: tabRegBloc = {
         EU: { countries: [], population: 0, languages: {}, currencies: [] },
@@ -43,13 +24,13 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
                 if(el.regionalBlocs.find(i => i.acronym === 'EU')) {
                     euBlock.push(el);
                 }
-                else if(el.regionalBlocs.find(i => i.acronym === 'AU')) {
+                if(el.regionalBlocs.find(i => i.acronym === 'AU')) {
                     auBlock.push(el);
                 }
-                else if(el.regionalBlocs.find(i => i.acronym === 'NAFTA')) {
+                if(el.regionalBlocs.find(i => i.acronym === 'NAFTA')) {
                     naftaBlock.push(el);
                 } 
-                else {
+                if(el.regionalBlocs.find(i => (i.acronym != 'EU' && i.acronym != 'AU' && i.acronym != 'NAFTA' ))) {
                     otherBlock.push(el);
                 }
             } else {
@@ -59,63 +40,24 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
     }
 
     // wyciągnięcie nativeName państw
-    const getNativeName = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other') => {
+    const getNativeName = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
         stateInRegionalBloc.forEach(el => {
-            if(el.nativeName != undefined) {
-                switch(nameBlock) {
-                    case 'EU':
-                        regionalBlocs.EU.countries.push(el.nativeName);
-                        regionalBlocs.EU.countries.sort().reverse();
-                        break;
-                    case 'AU' :
-                        regionalBlocs.AU.countries.push(el.nativeName);
-                        regionalBlocs.AU.countries.sort().reverse();
-                        break;
-                    case 'NAFTA':
-                        regionalBlocs.NAFTA.countries.push(el.nativeName);
-                        regionalBlocs.NAFTA.countries.sort().reverse();
-                        break;
-                    case 'other':
-                        regionalBlocs.other.countries.push(el.nativeName);
-                        regionalBlocs.other.countries.sort().reverse();
-                        break;
-                    default:
-                        console.log('Błędny argument nameBlock.');
-                }
+            if(el.nativeName != undefined && nameBlock != undefined) {
+                regionalBlocs[nameBlock].countries.push(el.nativeName);
+                regionalBlocs[nameBlock].countries.sort().reverse();
             } else {
-                throw Error('W tablicy są państwa, które nie mają nativeName.');
+                console.log('W tablicy są państwa, które nie mają nativeName.');
             }
         })
     }
 
-    const startGetNativeName = () => {
-        getNativeName(euBlock, 'EU');
-        getNativeName(auBlock, 'AU');
-        getNativeName(naftaBlock, 'NAFTA');
-        getNativeName(otherBlock, 'other');
-    }
-
     // wyciąganie currencies państw
-    const getCurrencies = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other') => {
+    const getCurrencies = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
         stateInRegionalBloc.forEach(el => {
             if(Array.isArray(el.currencies)) {
                 el.currencies.forEach(item => {
-                    switch(nameBlock) {
-                        case 'EU':
-                            if(!regionalBlocs.EU.currencies.includes(item.code)) regionalBlocs.EU.currencies.push(item.code);
-                            break;
-                        case 'AU' :
-                            if(!regionalBlocs.AU.currencies.includes(item.code)) regionalBlocs.AU.currencies.push(item.code);
-                            break;
-                        case 'NAFTA':
-                            if(!regionalBlocs.NAFTA.currencies.includes(item.code)) regionalBlocs.NAFTA.currencies.push(item.code);
-                            break;
-                        case 'other':
-                            if(!regionalBlocs.other.currencies.includes(item.code)) regionalBlocs.other.currencies.push(item.code);
-                            break;
-                        default:
-                            console.log('Błędny argument nameBlock.');
-                    }
+                    if(nameBlock != undefined && !regionalBlocs[nameBlock].currencies.includes(item.code)) 
+                        regionalBlocs[nameBlock].currencies.push(item.code);                    
                 })
             } else {
                 console.log(`${el.name} nie posiada informacji o walutach`);
@@ -123,57 +65,27 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
         });
     }
 
-    const startGetCurrencies = () => {
-        getCurrencies(euBlock, 'EU');
-        getCurrencies(auBlock, 'AU');
-        getCurrencies(naftaBlock, 'NAFTA');
-        getCurrencies(otherBlock, 'other');
-    }
-
     // dodawanie populacji państw
-    const getSumPopulation = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other') => {
+    const getSumPopulation = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
         stateInRegionalBloc.forEach(el => {
-            if(typeof el.population === 'number') {
-                switch(nameBlock) {
-                    case 'EU':
-                        regionalBlocs.EU.population += el.population;
-                        break;
-                    case 'AU' :
-                        regionalBlocs.AU.population += el.population;
-                        break;
-                    case 'NAFTA':
-                        regionalBlocs.NAFTA.population += el.population;
-                        break;
-                    case 'other':
-                        regionalBlocs.other.population += el.population;
-                        break;
-                    default:
-                        console.log('Błędny argument nameBlock.');
-                }
-            }
+            if(typeof el.population === 'number' && nameBlock != undefined)
+                regionalBlocs[nameBlock].population += el.population;                
         });
     }
 
-    const startGetSumPopulation = () => {
-        getSumPopulation(euBlock, 'EU');
-        getSumPopulation(auBlock, 'AU');
-        getSumPopulation(naftaBlock, 'NAFTA');
-        getSumPopulation(otherBlock, 'other');
-    }
-
     // dodawanie informacji o językach
-    const getLanguages = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other') => {
-        let stringToObj = makeReferenceToObj(nameBlock);
+    const getLanguages = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
+        const languagesObj = regionalBlocs[nameBlock].languages
 
         stateInRegionalBloc.forEach(singleState => {
-            if(Array.isArray(singleState.languages)) {
+            if(Array.isArray(singleState.languages) && nameBlock != undefined) {
                 singleState.languages.forEach(singleLanguage => {
-                    
-                    if(stringToObj != undefined && stringToObj[singleLanguage.iso639_1]) {
-                        addDataToObjLanguage(nameBlock, singleState, singleLanguage.iso639_1, true);
-                    } else if(stringToObj != undefined) {
+
+                    if(languagesObj != undefined && languagesObj[singleLanguage.iso639_1]) {
+                        addDataToObjLanguage(languagesObj, singleState, singleLanguage.iso639_1, true)
+                    } else if (languagesObj != undefined) {
                         createObjLanguage(nameBlock, singleLanguage.iso639_1);
-                        addDataToObjLanguage(nameBlock, singleState, singleLanguage.iso639_1);
+                        addDataToObjLanguage(languagesObj, singleState, singleLanguage.iso639_1)
                     }
 
                 });
@@ -183,35 +95,14 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
         });
     }
 
-    const startGetLanguages = () => {
-        getLanguages(euBlock, 'EU');
-        getLanguages(auBlock, 'AU');
-        getLanguages(naftaBlock, 'NAFTA');
-        getLanguages(otherBlock, 'other');
-    }
-
-    // generowanie dostępu do obiektu languages w obiektach dla poszczególnych bloków regionalnych
-    const makeReferenceToObj = (nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other') => {
-        switch(nameBlock) {
-            case 'EU':
-                return regionalBlocs.EU.languages;
-            case 'AU':
-                return regionalBlocs.AU.languages;
-            case 'NAFTA':
-                return regionalBlocs.NAFTA.languages;
-            case 'other':
-                return regionalBlocs.other.languages;
-            default:
-                console.log('Błędny argument nameBlock.');
-        }
-    }
-
     // tworzenie pustego obiektu w languages (key to kod języka)
-    const createObjLanguage = (nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other', codeLang: string) => {
-        let stringToObj = makeReferenceToObj(nameBlock);
+    const createObjLanguage = (nameBlock: RegBlocs, codeLang: string) => {
+        const referenceToObj = regionalBlocs[nameBlock].languages;
 
-        if(stringToObj != undefined) {
-            stringToObj[codeLang] = {
+        if(!referenceToObj) {
+            console.log(`Nie ma obiektu languages w bloku ${nameBlock}`)
+        } else {
+            return referenceToObj[codeLang] = {
                 countries: [],
                 name: '',
                 population: 0,
@@ -220,41 +111,52 @@ export const startRegionalbloc = (dataFromApi: Array<TabWithStates>) => {
         }
     }
 
-    // dodawanie danych do obiektu danego języka w languages
-    const addDataToObjLanguage = (nameBlock: 'EU' | 'AU' | 'NAFTA' | 'other', country: TabWithStates, codeLang: string, langExist: boolean = false) => {
-        let stringToObj = makeReferenceToObj(nameBlock);
-
-        if(stringToObj != undefined) {
-            if(country.alpha3Code) stringToObj[codeLang].countries.push(country.alpha3Code);
-            if(country.population) stringToObj[codeLang].population += country.population;
-            if(country.area) stringToObj[codeLang].area += country.area;      
+    // dodawanie właściwości do obiektu languages
+    const addDataToObjLanguage = (referenceToObj: any, country: TabWithStates, codeLang: string, langExist: boolean = false) => {
+        if(referenceToObj != undefined) {
+            if(country.alpha3Code) referenceToObj[codeLang].countries.push(country.alpha3Code);
+            if(country.population) referenceToObj[codeLang].population += country.population;
+            if(country.area) referenceToObj[codeLang].area += country.area;      
             if(langExist) {
-                if(country.nativeName) stringToObj[codeLang].name += `, ${country.nativeName}`;
+                if(country.nativeName) referenceToObj[codeLang].name += `, ${country.nativeName}`;
             } else {
-                if(country.nativeName) stringToObj[codeLang].name += country.nativeName;
+                if(country.nativeName) referenceToObj[codeLang].name += country.nativeName;
             }
         }
     }
 
-    
+    // funkcja zbierająca funkcje "cząstkowe", które budują poszczególne części nowego obiektu
+    const makeNewRegBloc = () => {
+        const parametersRegBlocs: Array<[Array<TabWithStates>, RegBlocs]> = [
+            [euBlock, 'EU'], [auBlock, 'AU'], [naftaBlock, 'NAFTA'], [otherBlock, 'other']
+        ];
 
+        parametersRegBlocs.forEach( item => {
+            getNativeName(item[0], item[1]);
+            getCurrencies(item[0], item[1]);
+            getSumPopulation(item[0], item[1]);
+            getLanguages(item[0], item[1]);
 
-    
-    // kolejnosć wywoływania funkcji
-    getRegionalArray(dataFromApi);
-    startGetNativeName();
-    startGetCurrencies();
-    startGetSumPopulation();
-    startGetLanguages();
+        })
+    }
 
-
+    // konsolowanie informacji o nowym obiekcie
     const showConsole = () => {
-        console.log('tablice z blokami :', [euBlock, auBlock, naftaBlock, otherBlock]);
+        // console.log('tablice z blokami :', [euBlock, auBlock, naftaBlock, otherBlock]);
         console.log('Nowy obiekt z nativeName: ', regionalBlocs);
     }
+
+    // kolejnosć wywoływania funkcji
+    getRegionalArray(dataFromApi);
+    makeNewRegBloc()
     showConsole();
 
     return regionalBlocs;
+
+
+
+
+
 
     // ==========================================
     // ======== od tego wyszedłem ===============

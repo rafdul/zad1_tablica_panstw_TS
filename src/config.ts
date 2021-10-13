@@ -24,6 +24,30 @@ export interface TabWithStates {
     languages?: Array<{iso639_1: string, iso639_2: string, name: string, nativeName: string}>,
 };
 
+interface RegBlocInfo {
+    countries: Array<string>,
+    population: number,
+    languages?: {
+        [key: string]: {
+            countries: Array<string>,
+            population: number,
+            area: number,
+            name: string,
+        },
+    }
+    currencies: Array<string>,
+};
+
+// export interface tabRegBloc {
+//     EU: RegBlocInfo,
+//     NAFTA: RegBlocInfo,
+//     AU: RegBlocInfo,
+//     other: RegBlocInfo,
+// }
+
+export type RegBlocs = 'EU' | 'NAFTA' | 'AU' | 'other';
+export type tabRegBloc = Record<RegBlocs, RegBlocInfo>;
+
 // zmienna zawierająca bibliotekę komunikatów w konsoli
 export var logsTexts: Texts = {
     tableWithStates: {
