@@ -1,10 +1,10 @@
-import { startRegionalbloc } from './tableRegionalBloc';
+import { makeRegionalBlocs } from './tableRegionalBloc';
 import { mockValues } from './mocks';
 
 describe('Check, if new object with regional blocs is created and:' , () => {
 
     test(`check, if countries' nativeName are matched with regional blocs`, () => {
-        let testRegBloc = startRegionalbloc(mockValues.statesForNewObj);
+        let testRegBloc = makeRegionalBlocs(mockValues.statesForNewObj);
         // console.log('==test1==', testRegBloc)
 
         expect(testRegBloc.NAFTA.countries.length).toEqual(2);
@@ -12,7 +12,7 @@ describe('Check, if new object with regional blocs is created and:' , () => {
     });
 
     test(`check, if countries' nativeName are sorted from z to a`, () => {
-        let testRegBloc = startRegionalbloc(mockValues.statesForNewObj);
+        let testRegBloc = makeRegionalBlocs(mockValues.statesForNewObj);
         // console.log('==test1==', testRegBloc)
 
         expect(testRegBloc.other.countries.indexOf('perussssss')).toBeLessThan(testRegBloc.other.countries.indexOf('chinasssss'));
@@ -20,7 +20,7 @@ describe('Check, if new object with regional blocs is created and:' , () => {
     });
 
     test(`check, if countries' currencies are matched with regional blocs`, () => {
-        let testRegBloc = startRegionalbloc(mockValues.statesForNewObj);
+        let testRegBloc = makeRegionalBlocs(mockValues.statesForNewObj);
         // console.log('==test2==', testRegBloc)
 
         expect(testRegBloc.EU.currencies.some(el => el === 'CZK')).toBe(true);
@@ -28,7 +28,7 @@ describe('Check, if new object with regional blocs is created and:' , () => {
     });
 
     test(`check, if countries' currencies are uniqe in the table with currencies`, () => {
-        let testRegBloc = startRegionalbloc(mockValues.statesForNewObj);
+        let testRegBloc = makeRegionalBlocs(mockValues.statesForNewObj);
         // console.log('==test2==', testRegBloc)
 
         expect(testRegBloc.EU.currencies.length).toEqual(testRegBloc.EU.countries.length - 1);
@@ -36,7 +36,7 @@ describe('Check, if new object with regional blocs is created and:' , () => {
     });
 
     test(`check, if countries' populations are summed`, () => {
-        let testRegBloc = startRegionalbloc(mockValues.statesForNewObj);
+        let testRegBloc = makeRegionalBlocs(mockValues.statesForNewObj);
         // console.log('==test3==', testRegBloc);
         let populationForNafta = 132322035;
         let populationForOther = 1153261217;
@@ -53,7 +53,7 @@ describe(`Check, if object with countries' languages is created and:` , () => {
     let testSumArea = 205715;
 
     beforeAll( () => {
-        let testRegBloc = startRegionalbloc(mockValues.statesForNewObj);
+        let testRegBloc = makeRegionalBlocs(mockValues.statesForNewObj);
         for(const key in testRegBloc.NAFTA.languages) {
             testArray.push(key)
         }
