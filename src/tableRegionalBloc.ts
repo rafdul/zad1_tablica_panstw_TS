@@ -271,7 +271,7 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
 }
 
 export const getInfoLanguages = (data: Array<TabWithStates>) => {
-    // console.log('start funkcji o językach', data);
+
     interface LangObj {
         [key: string]: {
             countries: Array<string>,
@@ -302,7 +302,7 @@ export const getInfoLanguages = (data: Array<TabWithStates>) => {
             }
         });
 
-        console.log('wszystkie languages', languages)
+        // console.log('wszystkie languages', languages)
         return languages;
     }
 
@@ -342,9 +342,8 @@ export const getInfoLanguages = (data: Array<TabWithStates>) => {
             });
         }
         
-        // console.log('1 arrCheckedValue przed sortowaniem', arrCheckedValue);
         compareValue(arrCheckedValue)
-        console.log('1 arrCheckedValue po sortowaniu', arrCheckedValue);
+        // console.log('1 arrCheckedValue po sortowaniu', arrCheckedValue);
 
         return arrCheckedValue
     }
@@ -361,50 +360,58 @@ export const getInfoLanguages = (data: Array<TabWithStates>) => {
         return tableWithData.sort(compare)
     }
 
-    const allLang = createAllLang(data);
-
     // funkcja sprawdzająca remis
     const checkDraw = (tableWithData: Array<[string, number | string[]]>, index: number) => {
         const referenceValue = tableWithData[index];
-        console.log('referenceValue', referenceValue)
         const arrExAequo: Array<string> = [];
 
         tableWithData.forEach( item => {
             if(item[1] == referenceValue[1]) arrExAequo.push(item[0])
         });
 
-        console.log('arrExAequo', arrExAequo)
+        // console.log('arrExAequo', arrExAequo)
         return arrExAequo;
     }
 
+    // funkcja zamieniająca kod języka na nativeName
     const changeCodeToNativeName = (fullData: LangObj, codeLang: Array<string>) => {
         const arrWithNativeName: Array<string> = []
         
         codeLang.forEach( el => arrWithNativeName.push(fullData[el].name));
 
-        console.log('arrWithNativeName', arrWithNativeName)
+        // console.log('arrWithNativeName', arrWithNativeName)
         return arrWithNativeName
     }
 
-    // Natywną nazwę języka wykorzystywanego w największej liczbie krajów,
+    // stworzenie obiektu z pełną informacją o językach
+    const allLang = createAllLang(data);
+
+    // Natywna nazwa języka wykorzystywanego w największej liczbie krajów,
     const languagesByCountries = getTheMostPopularLang(allLang, 'countries');
     const codeTheMostPopularLanguage = checkDraw(languagesByCountries, 0);
     const nativeNameTheMostPopularLanguage = changeCodeToNativeName(allLang, codeTheMostPopularLanguage)
 
-    // Natywną nazwę języka wykorzystywanego przez najmniejszą liczbę ludzi,
+    // Natywna nazwa języka wykorzystywanego przez najmniejszą liczbę ludzi,
     const languagesByPopulation = getTheMostPopularLang(allLang, 'population');
-    const codeTheLeastPopularLanguage = checkDraw(languagesByPopulation, languagesByCountries.length-1);
+    const codeTheLeastPopularLanguage = checkDraw(languagesByPopulation, languagesByPopulation.length-1);
     const nativeNameTheLeastPopularLanguage = changeCodeToNativeName(allLang, codeTheLeastPopularLanguage)
 
     // Natywne nazwy języków wykorzystywanych na największym obszarze
+    const languagesByArea = getTheMostPopularLang(allLang, 'area');
+    const codeLanguageTheBiggestArea = checkDraw(languagesByArea, 0);
+    const nativeNameLanguageTheBiggestArea = changeCodeToNativeName(allLang, codeLanguageTheBiggestArea)
 
     // Natywne nazwy języków wykorzystywanych na najmniejszym obszarze
+    const codeLanguageTheSmallestArea = checkDraw(languagesByArea, languagesByArea.length-1);
+    const nativeNameLanguageTheSmallestArea = changeCodeToNativeName(allLang, codeLanguageTheSmallestArea)
 
 
     const showConsole = () => {
-        console.log(`Natywna nazwa języka (języków):
-        - używanego w największej liczbie państw: ${nativeNameTheMostPopularLanguage},
+        console.log(`Natywne nazwy języków:
+        - używanych w największej liczbie państw: ${nativeNameTheMostPopularLanguage},
         - używanych przez najmniejszą liczbę ludzi: ${nativeNameTheLeastPopularLanguage},
+        - wykorzystywanych na największym obszarze: ${nativeNameLanguageTheBiggestArea},
+        - wykorzystywanych na najmniejszym obszarze: ${nativeNameLanguageTheSmallestArea}
         `)
     }
     showConsole()
