@@ -1,4 +1,4 @@
-import { makeRegionalBlocs } from './tableRegionalBloc';
+import { makeRegionalBlocs, getInfoRegBloc, getInfoLanguages } from './tableRegionalBloc';
 import { mockValues } from './mocks';
 
 describe('Check, if new object with regional blocs is created and:' , () => {
@@ -82,3 +82,38 @@ describe(`Check, if object with countries' languages is created and:` , () => {
         expect(resultObj && resultObj.value.area).toEqual(testSumArea);
     });
 });
+
+describe('Test getInfoBloc', () => {
+    test('if information in console.log is correct', () => {
+        let testRegBloc = makeRegionalBlocs(mockValues.statesForNewObj);
+        let expectedText = `Blok:
+        - pierwszy pod wzgl. populacji: other,
+        - drugi pod wzgl. gęstości: AU,
+        - trzeci pod wzgl. obszaru: NAFTA,
+        - ostatni pod wzgl. liczby krajów: AU,
+        - pierwszy pod wzgl. liczby walut: EU,
+        - pierwszy pod wzgl. liczby języków: EU,
+        - ostatni pod względem liczby języków: other
+        `
+
+        console.log = jest.fn();
+        getInfoRegBloc(testRegBloc);
+
+        expect(console.log).toHaveBeenCalledWith(expectedText);
+    });
+})
+
+describe('Test getInfoLanguages', () => {
+    test('if information in console.log is correct', () => {
+        let expectedText = `Natywne nazwy języków:
+            - używane w największej liczbie państw: Espaniol,
+            - używanych przez najmniejszą liczbę ludzi: cestina,
+            - wykorzystywanych na największym obszarze: Espaniol,
+            - wykorzystywanych na najmniejszym obszarze: Nederlands`;
+
+        console.log = jest.fn();
+        getInfoLanguages(mockValues.statesForNewObj);
+
+        expect(console.log).toHaveBeenCalledWith(expectedText);
+    });
+})

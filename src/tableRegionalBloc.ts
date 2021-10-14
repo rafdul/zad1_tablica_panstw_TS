@@ -1,4 +1,4 @@
-import { TabWithStates, tabRegBloc, RegBlocs, RegBlocInfo, LangObj } from './config'
+import { TabWithStates, tabRegBloc, RegBlocs, LangObj } from './config'
 import { compareValue, getLanguages } from './utilsFunctions';
 
 export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
@@ -181,13 +181,10 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     const blockFirstCurrencies = showInfoAboutOrder(someData, 'countries', 0)
     
     // Nazwy organizacji o największej przypisanej do nich liczbie języków,
-    // const blockFirstAmountLanguages = showInfoAboutAmountLanguages(someData, 'languages').at(0);
-    const blockFirstAmountLanguages = showInfoAboutOrder(someData, 'languages').at(0);
+    const blockFirstAmountLanguages = showInfoAboutOrder(someData, 'languages')[0];
 
     // Nazwy organizacji o najmniejszej przypisanej do nich liczbie języków,
-    // const blockLastAmountLanguages = showInfoAboutAmountLanguages(someData, 'languages').at(-1);
-    const blockLastAmountLanguages = showInfoAboutOrder(someData, 'languages').at(-1);
-
+    const blockLastAmountLanguages = showInfoAboutOrder(someData, 'languages');
 
     const showConsole = () => {
         console.log(`Blok:
@@ -196,8 +193,8 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
         - trzeci pod wzgl. obszaru: ${blockThirdArea},
         - ostatni pod wzgl. liczby krajów: ${blockLastCountries},
         - pierwszy pod wzgl. liczby walut: ${blockFirstCurrencies},
-        - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages && blockFirstAmountLanguages[0]},
-        - ostatni pod względem liczby języków: ${blockLastAmountLanguages && blockLastAmountLanguages[0]}
+        - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages[0]},
+        - ostatni pod względem liczby języków: ${blockLastAmountLanguages[blockLastAmountLanguages.length-1][0]}
         `)
     }
     showConsole()
@@ -282,11 +279,10 @@ export const getInfoLanguages = (data: Array<TabWithStates>) => {
 
         const showConsole = () => {
             console.log(`Natywne nazwy języków:
-            - używanych w największej liczbie państw: ${nativeNameTheMostPopularLanguage},
+            - używane w największej liczbie państw: ${nativeNameTheMostPopularLanguage},
             - używanych przez najmniejszą liczbę ludzi: ${nativeNameTheLeastPopularLanguage},
             - wykorzystywanych na największym obszarze: ${nativeNameLanguageTheBiggestArea},
-            - wykorzystywanych na najmniejszym obszarze: ${nativeNameLanguageTheSmallestArea}
-            `)
+            - wykorzystywanych na najmniejszym obszarze: ${nativeNameLanguageTheSmallestArea}`)
         }
 
         showConsole();
