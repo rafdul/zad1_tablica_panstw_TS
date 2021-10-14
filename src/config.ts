@@ -24,7 +24,7 @@ export interface TabWithStates {
     languages?: Array<{iso639_1: string, iso639_2: string, name: string, nativeName: string}>,
 };
 
-interface RegBlocInfo {
+export interface RegBlocInfo {
     countries: Array<string>,
     population: number,
     languages?: {

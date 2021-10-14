@@ -1,4 +1,4 @@
-import { TabWithStates, tabRegBloc, RegBlocs } from './config'
+import { TabWithStates, tabRegBloc, RegBlocs, RegBlocInfo } from './config'
 
 export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
     console.log('START danych dla bloków regionalnych');
@@ -175,25 +175,33 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     // console.log('someData', someData)
     // console.log('Object.keys(ob)', Object.keys(someData))
     // console.log('Object.values(ob)', Object.values(someData))
-    console.log('Object.entries(ob)', Object.entries(someData))
+    // console.log('Object.entries(ob)', Object.entries(someData))
     
 
     // funkcje obliczające kolejność pod wzgl populacji, obszaru, gęstości
-    const showInfoAboutBlock = (data:tabRegBloc, keyWord: 'population' | 'area' | 'density', noPlace: number) => {
-        const arrKeyValue= Object.entries(someData);
-        const arrCheckedValue : Array<[string, number]> = [];
+    const showInfoAboutOrder = (data:tabRegBloc, keyWord: 'population' | 'area' | 'density' | 'countries' | 'currencies', noPlace: number) => {
+        const arrKeyValue= Object.entries(data);
+        const arrCheckedValue : Array<[string, number | string[]]> = [];
         
-        arrKeyValue.forEach( item => {
-            arrCheckedValue.push([item[0], item[1][keyWord] ])
-        });
-        // console.log('arrCheckedValue', arrCheckedValue);
+        if(keyWord === 'population' || keyWord === 'area' || keyWord ==='density') {
+            arrKeyValue.forEach( item => {
+                arrCheckedValue.push([item[0], item[1][keyWord] ])
+            });
+        }
+
+        if(keyWord === 'countries' || keyWord === 'currencies') {
+            arrKeyValue.forEach( item => {
+                arrCheckedValue.push([item[0], item[1][keyWord].length ])
+            });
+        }
         
         compareValue(arrCheckedValue);
+        // console.log('arrCheckedValue', arrCheckedValue);
 
         return arrCheckedValue[noPlace][0];
     }
 
-    const compareValue = (tableWithData: Array<[string, number]>) => {
+    const compareValue = (tableWithData: Array<[string, number | string[]]>) => {
         function compare(a:any, b:any): number  {
             if(typeof a[1] === 'number' && typeof b[1] === 'number') {
                 if (a[1] > b[1]) {
@@ -205,20 +213,46 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
         return tableWithData.sort(compare)
     }
 
+    // funkcja obliczająca liczbę języków w bloku regionalnym
+    const showInfoAboutAmountLanguages = (data:tabRegBloc) => {
+        const arrKeyValue= Object.entries(data);
+        // console.log('Object.entries(ob)', arrKeyValue)
+        const arrCheckedValue : Array<[string, number]> = [];
+        
+        arrKeyValue.forEach( item => {
+            if(typeof item[1].languages !== 'undefined') {
+                let amountOfLang = Object.keys(item[1].languages);
+                arrCheckedValue.push([item[0], amountOfLang.length ]);
+            }
+        });
+
+        compareValue(arrCheckedValue);
+        // console.log('arrCheckedValue2', arrCheckedValue);
+
+        return arrCheckedValue;
+    }
+
     // Nazwę organizacji o największej populacji,
-    const blockFirstPopulation = showInfoAboutBlock(someData, 'population', 0);
+    const blockFirstPopulation = showInfoAboutOrder(someData, 'population', 0);
     
     // Nazwę organizacji o drugiej największej gęstości zaludnienia,
-    const blockSecondDensity = showInfoAboutBlock(someData, 'density', 1);
+    const blockSecondDensity = showInfoAboutOrder(someData, 'density', 1);
 
     // Nazwę organizacji zajmującej trzeci największy obszar,
-    const blockThirdArea = showInfoAboutBlock(someData, 'area', 2)
+    const blockThirdArea = showInfoAboutOrder(someData, 'area', 2)
 
+    // Nazwę organizacji posiadającej najmniejszą liczbę państw członkowskich, 
+    const blockLastCountries = showInfoAboutOrder(someData, 'countries', 3);
     
-
-    // Nazwy organizacji o największej i najmniejszej przypisanej do nich liczbie języków,
     // Nazwę organizacji wykorzystującej największą liczbę walut,
-    // Nazwę organizacji posiadającej najmniejszą liczbę państw członkowskich,
+    const blockFirstCurrencies = showInfoAboutOrder(someData, 'countries', 0)
+    
+    // Nazwy organizacji o największej przypisanej do nich liczbie języków,
+    const blockFirstAmountLanguages = showInfoAboutAmountLanguages(someData);
+
+    // Nazwy organizacji o najmniejszej przypisanej do nich liczbie języków,
+    let blockLastAmountLanguages = showInfoAboutAmountLanguages(someData).at(-1);
+
     // Natywną nazwę języka wykorzystywanego w największej liczbie krajów,
     // Natywną nazwę języka wykorzystywanego przez najmniejszą liczbę ludzi,
     // Natywne nazwy języków wykorzystywanych na największym i najmniejszym obszarze.
@@ -227,8 +261,12 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     const showConsole = () => {
         console.log(`Blok:
         - pierwszy pod wzgl. populacji: ${blockFirstPopulation},
-        - drugi pod wzgl gęstości: ${blockSecondDensity},
-        - trzeci pod wzgl obszaru: ${blockThirdArea},
+        - drugi pod wzgl. gęstości: ${blockSecondDensity},
+        - trzeci pod wzgl. obszaru: ${blockThirdArea},
+        - ostatni pod wzgl. liczby krajów: ${blockLastCountries},
+        - pierwszy pod wzgl. liczby walut: ${blockFirstCurrencies},
+        - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages[0]},
+        - ostatni pod względem liczby języków: ${blockLastAmountLanguages && blockLastAmountLanguages[0]}
         `)
     }
     showConsole()
