@@ -11,6 +11,15 @@ interface Texts {
     }
 }
 
+export interface LangObj {
+    [key: string]: {
+        countries: Array<string>,
+        population: number,
+        area: number,
+        name: string,
+    },
+}
+
 export interface TabWithStates {
     name: string,
     population: number,
@@ -27,14 +36,15 @@ export interface TabWithStates {
 export interface RegBlocInfo {
     countries: Array<string>,
     population: number,
-    languages?: {
-        [key: string]: {
-            countries: Array<string>,
-            population: number,
-            area: number,
-            name: string,
-        },
-    }
+    // languages?: {
+    //     [key: string]: {
+    //         countries: Array<string>,
+    //         population: number,
+    //         area: number,
+    //         name: string,
+    //     },
+    // }
+    languages?: LangObj,
     currencies: Array<string>,
     area: number,
     density: number,
