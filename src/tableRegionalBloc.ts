@@ -172,31 +172,33 @@ export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
 
 export const getInfoRegBloc = (someData:tabRegBloc) => {
     
-    // console.log('someData', someData)
+    console.log('someData', someData)
     // console.log('Object.keys(ob)', Object.keys(someData))
     // console.log('Object.values(ob)', Object.values(someData))
-    // console.log('Object.entries(ob)', Object.entries(someData))
+    console.log('Object.entries(ob)', Object.entries(someData))
     
+    type numberKeyWord = 'population' | 'area' | 'density';
+    type arrayKeyWord = 'countries' | 'currencies'
 
     // funkcje obliczające kolejność pod wzgl populacji, obszaru, gęstości
-    const showInfoAboutOrder = (data:tabRegBloc, keyWord: 'population' | 'area' | 'density' | 'countries' | 'currencies', noPlace: number) => {
+    const showInfoAboutOrder = (data: tabRegBloc, keyWord: numberKeyWord | arrayKeyWord, noPlace: number) => {
         const arrKeyValue= Object.entries(data);
-        const arrCheckedValue : Array<[string, number | string[]]> = [];
+        const arrCheckedValue: Array<[string, number | string[]]> = [];
         
-        if(keyWord === 'population' || keyWord === 'area' || keyWord ==='density') {
+        if( ['population', 'area', 'density'].includes(keyWord) ) {
             arrKeyValue.forEach( item => {
                 arrCheckedValue.push([item[0], item[1][keyWord] ])
             });
         }
 
-        if(keyWord === 'countries' || keyWord === 'currencies') {
+        if( keyWord === 'countries' || keyWord === 'currencies') {
             arrKeyValue.forEach( item => {
                 arrCheckedValue.push([item[0], item[1][keyWord].length ])
             });
         }
         
         compareValue(arrCheckedValue);
-        // console.log('arrCheckedValue', arrCheckedValue);
+        // console.log(`tablica [blok, ${keyWord}]`, arrCheckedValue);
 
         return arrCheckedValue[noPlace][0];
     }
@@ -214,7 +216,7 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     }
 
     // funkcja obliczająca liczbę języków w bloku regionalnym
-    const showInfoAboutAmountLanguages = (data:tabRegBloc) => {
+    const showInfoAboutAmountLanguages = (data: tabRegBloc) => {
         const arrKeyValue= Object.entries(data);
         // console.log('Object.entries(ob)', arrKeyValue)
         const arrCheckedValue : Array<[string, number]> = [];
@@ -227,7 +229,7 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
         });
 
         compareValue(arrCheckedValue);
-        // console.log('arrCheckedValue2', arrCheckedValue);
+        // console.log('tablica [blok, liczba języków]', arrCheckedValue);
 
         return arrCheckedValue;
     }
@@ -248,14 +250,10 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     const blockFirstCurrencies = showInfoAboutOrder(someData, 'countries', 0)
     
     // Nazwy organizacji o największej przypisanej do nich liczbie języków,
-    const blockFirstAmountLanguages = showInfoAboutAmountLanguages(someData);
+    const blockFirstAmountLanguages = showInfoAboutAmountLanguages(someData).at(0);
 
     // Nazwy organizacji o najmniejszej przypisanej do nich liczbie języków,
-    let blockLastAmountLanguages = showInfoAboutAmountLanguages(someData).at(-1);
-
-    // Natywną nazwę języka wykorzystywanego w największej liczbie krajów,
-    // Natywną nazwę języka wykorzystywanego przez najmniejszą liczbę ludzi,
-    // Natywne nazwy języków wykorzystywanych na największym i najmniejszym obszarze.
+    const blockLastAmountLanguages = showInfoAboutAmountLanguages(someData).at(-1);
 
 
     const showConsole = () => {
@@ -265,11 +263,150 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
         - trzeci pod wzgl. obszaru: ${blockThirdArea},
         - ostatni pod wzgl. liczby krajów: ${blockLastCountries},
         - pierwszy pod wzgl. liczby walut: ${blockFirstCurrencies},
-        - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages[0]},
+        - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages && blockFirstAmountLanguages[0]},
         - ostatni pod względem liczby języków: ${blockLastAmountLanguages && blockLastAmountLanguages[0]}
         `)
     }
     showConsole()
 }
 
+export const getInfoLanguages = (data: Array<TabWithStates>) => {
+    // console.log('start funkcji o językach', data);
+    interface LangObj {
+        [key: string]: {
+            countries: Array<string>,
+            population: number,
+            area: number,
+            name: string,
+        },
+    }
+
+    // tworzę obiekt zawierający wszystkie języki (bez podziału na bloki regionalne)
+    const languages: LangObj = {};
+
+    const createAllLang = (data: Array<TabWithStates>) => {
+            
+        data.forEach(state => {
+            if(Array.isArray(state.languages)) {
+                state.languages.forEach(singleLanguage => {
+
+                    if(languages !== undefined && languages[singleLanguage.iso639_1]) {
+                        addDataToObjLang(state, singleLanguage.iso639_1, singleLanguage.nativeName, true)
+                    } else if (languages !== undefined) {
+                        createObjLang(singleLanguage.iso639_1);
+                        addDataToObjLang(state, singleLanguage.iso639_1, singleLanguage.nativeName)
+                    }
+                });
+            } else {
+                console.log(`${state.name} nie posiada informacji o językach`);
+            }
+        });
+
+        console.log('wszystkie languages', languages)
+        return languages;
+    }
+
+    const createObjLang = (codeLang: string) => {
+        return languages[codeLang] = {
+            countries: [],
+            name: '',
+            population: 0,
+            area: 0
+        }
+    }
+
+    const addDataToObjLang = (country: TabWithStates, codeLang: string, nativeNameLang: string, langExist: boolean = false) => {
+        if(country.alpha3Code) languages[codeLang].countries.push(country.alpha3Code);
+        if(country.population) languages[codeLang].population += country.population;
+        if(country.area) languages[codeLang].area += country.area;      
+        if(langExist === false) {if(country.nativeName) languages[codeLang].name += nativeNameLang;}
+    }
+
+    // createAllLang(data);
+
+    // funkcja porównująca języki pod względem liczby krajów, populacji, powierzchni państw
+    const getTheMostPopularLang = (data:LangObj, keyWord: 'countries' | 'population' | 'area') => {
+        const arrKeyValue = Object.entries(data);
+        // console.log('1 arrKeyValue', arrKeyValue);
+        const arrCheckedValue: Array<[string, number]> = [];
+
+        if(keyWord === 'countries') {
+            arrKeyValue.forEach( item => {
+                arrCheckedValue.push([item[0], item[1][keyWord].length ])
+            });
+        }
+
+        if(keyWord === 'population' || keyWord === 'area') {
+            arrKeyValue.forEach( item => {
+                arrCheckedValue.push([item[0], item[1][keyWord] ])
+            });
+        }
+        
+        // console.log('1 arrCheckedValue przed sortowaniem', arrCheckedValue);
+        compareValue(arrCheckedValue)
+        console.log('1 arrCheckedValue po sortowaniu', arrCheckedValue);
+
+        return arrCheckedValue
+    }
+
+    const compareValue = (tableWithData: Array<[string, number | string[]]>) => {
+        function compare(a:any, b:any): number  {
+            if(typeof a[1] === 'number' && typeof b[1] === 'number') {
+                if (a[1] > b[1]) {
+                    return -1;
+                }
+            }
+            return 0;
+        }
+        return tableWithData.sort(compare)
+    }
+
+    const allLang = createAllLang(data);
+
+    // funkcja sprawdzająca remis
+    const checkDraw = (tableWithData: Array<[string, number | string[]]>, index: number) => {
+        const referenceValue = tableWithData[index];
+        console.log('referenceValue', referenceValue)
+        const arrExAequo: Array<string> = [];
+
+        tableWithData.forEach( item => {
+            if(item[1] == referenceValue[1]) arrExAequo.push(item[0])
+        });
+
+        console.log('arrExAequo', arrExAequo)
+        return arrExAequo;
+    }
+
+    const changeCodeToNativeName = (fullData: LangObj, codeLang: Array<string>) => {
+        const arrWithNativeName: Array<string> = []
+        
+        codeLang.forEach( el => arrWithNativeName.push(fullData[el].name));
+
+        console.log('arrWithNativeName', arrWithNativeName)
+        return arrWithNativeName
+    }
+
+    // Natywną nazwę języka wykorzystywanego w największej liczbie krajów,
+    const languagesByCountries = getTheMostPopularLang(allLang, 'countries');
+    const codeTheMostPopularLanguage = checkDraw(languagesByCountries, 0);
+    const nativeNameTheMostPopularLanguage = changeCodeToNativeName(allLang, codeTheMostPopularLanguage)
+
+    // Natywną nazwę języka wykorzystywanego przez najmniejszą liczbę ludzi,
+    const languagesByPopulation = getTheMostPopularLang(allLang, 'population');
+    const codeTheLeastPopularLanguage = checkDraw(languagesByPopulation, languagesByCountries.length-1);
+    const nativeNameTheLeastPopularLanguage = changeCodeToNativeName(allLang, codeTheLeastPopularLanguage)
+
+    // Natywne nazwy języków wykorzystywanych na największym obszarze
+
+    // Natywne nazwy języków wykorzystywanych na najmniejszym obszarze
+
+
+    const showConsole = () => {
+        console.log(`Natywna nazwa języka (języków):
+        - używanego w największej liczbie państw: ${nativeNameTheMostPopularLanguage},
+        - używanych przez najmniejszą liczbę ludzi: ${nativeNameTheLeastPopularLanguage},
+        `)
+    }
+    showConsole()
+}
 
