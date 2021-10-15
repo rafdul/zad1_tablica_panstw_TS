@@ -33,7 +33,7 @@ describe('Tests class TableWithStates. Check,', () => {
     });
 
     test('if function infoAboutChangingPopulation is called when there are data in storage', () => {
-        let dataFromAPI = mockValues.states0;
+        let dataFromAPI = mockValues.statesForNewObj;
         newStorage.saveStorage('states', dataFromAPI)
         newTableWithStatesFromAPI.infoAboutChangingPopulation = jest.fn();
 
@@ -228,7 +228,7 @@ describe('Tests class TableWithStatesEU. Check,', () => {
         expect(withoutLetter.every((el: any) => el.name.includes('m') === false)).toBe(true);
     });
 
-    test('if app called correct information in console.log when sum of pupulation less than 50M', () => {
+    test('if app called correct information in console.log when sum of pupulation less than 500M', () => {
         const testStates = mockValues.statesWithPopulation;
         const testStatesPopulationTop2 = 28140035;
         const expectedText = logsTexts.tableWithStatesEU.countEUPopulation.prelude + 2 + logsTexts.tableWithStatesEU.countEUPopulation.lessThan + testStatesPopulationTop2.toString() + logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates + 'Netherlands, Czech Republic'

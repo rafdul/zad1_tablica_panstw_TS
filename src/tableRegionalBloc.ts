@@ -67,7 +67,7 @@ export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
     // dodawanie populacji państw w ramach bloków
     const getSumPopulation = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
         stateInRegionalBloc.forEach(el => {
-            if(typeof el.population === 'number' && nameBlock != undefined)
+            if(el.population !== undefined && nameBlock !== undefined)
                 regionalBlocs[nameBlock].population += el.population;                
         });
     }
@@ -130,11 +130,11 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     type arrayKeyWord = 'countries' | 'currencies';
 
     // funkcje obliczające kolejność bloków pod wzgl różnych kryteriów (m.in. populacji, obszaru, gęstości...)
-    const showInfoAboutOrder = (data: tabRegBloc, keyWord: numberKeyWord | arrayKeyWord | 'languages', noPlace?: number) => {
+    const showInfoAboutOrder = (data: tabRegBloc, keyWord: numberKeyWord | arrayKeyWord | 'languages', indexInTable?: number) => {
         const arrKeyValue= Object.entries(data);
-        const arrCheckedValue: Array<[string, number | string[] | LangObj | undefined]> = [];
+        const arrCheckedValue: Array<[string, number ]> = [];
         
-        if( ['population', 'area', 'density'].includes(keyWord)) {
+        if( keyWord === 'population' || keyWord === 'area' || keyWord === 'density' ) {
             arrKeyValue.forEach( item => {
                 if(item[1][keyWord] ) arrCheckedValue.push([item[0], item[1][keyWord] ])
             });
@@ -158,8 +158,8 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
         compareValue(arrCheckedValue);
         // console.log(`tablica [blok, ${keyWord}]`, arrCheckedValue);
 
-        if(typeof noPlace === 'number') {
-            return arrCheckedValue[noPlace][0];
+        if(typeof indexInTable === 'number' && indexInTable >= 0) {
+            return arrCheckedValue[indexInTable][0];
         } else {
             return arrCheckedValue;
         }
@@ -186,18 +186,15 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     // Nazwy organizacji o najmniejszej przypisanej do nich liczbie języków,
     const blockLastAmountLanguages = showInfoAboutOrder(someData, 'languages');
 
-    const showConsole = () => {
-        console.log(`Blok:
-        - pierwszy pod wzgl. populacji: ${blockFirstPopulation},
-        - drugi pod wzgl. gęstości: ${blockSecondDensity},
-        - trzeci pod wzgl. obszaru: ${blockThirdArea},
-        - ostatni pod wzgl. liczby krajów: ${blockLastCountries},
-        - pierwszy pod wzgl. liczby walut: ${blockFirstCurrencies},
-        - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages[0]},
-        - ostatni pod względem liczby języków: ${blockLastAmountLanguages[blockLastAmountLanguages.length-1][0]}
-        `)
-    }
-    showConsole()
+    console.log(`Blok:
+    - pierwszy pod wzgl. populacji: ${blockFirstPopulation},
+    - drugi pod wzgl. gęstości: ${blockSecondDensity},
+    - trzeci pod wzgl. obszaru: ${blockThirdArea},
+    - ostatni pod wzgl. liczby krajów: ${blockLastCountries},
+    - pierwszy pod wzgl. liczby walut: ${blockFirstCurrencies},
+    - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages[0]},
+    - ostatni pod względem liczby języków: ${blockLastAmountLanguages[blockLastAmountLanguages.length-1][0]}
+    `)
 }
 
 export const getInfoLanguages = (data: Array<TabWithStates>) => {
@@ -276,16 +273,13 @@ export const getInfoLanguages = (data: Array<TabWithStates>) => {
         const codeLanguageTheSmallestArea = checkDraw(languagesByArea, languagesByArea.length-1);
         const nativeNameLanguageTheSmallestArea = changeCodeToNativeName(allLang, codeLanguageTheSmallestArea)
 
-
-        const showConsole = () => {
-            console.log(`Natywne nazwy języków:
+        console.log(`Natywne nazwy języków:
             - używane w największej liczbie państw: ${nativeNameTheMostPopularLanguage},
             - używanych przez najmniejszą liczbę ludzi: ${nativeNameTheLeastPopularLanguage},
             - wykorzystywanych na największym obszarze: ${nativeNameLanguageTheBiggestArea},
-            - wykorzystywanych na najmniejszym obszarze: ${nativeNameLanguageTheSmallestArea}`)
-        }
+            - wykorzystywanych na najmniejszym obszarze: ${nativeNameLanguageTheSmallestArea}`
+        )
 
-        showConsole();
     } else {
         console.log('Brak obiektu z językami')
     }    

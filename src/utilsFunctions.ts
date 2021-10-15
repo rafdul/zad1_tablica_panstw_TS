@@ -1,11 +1,15 @@
-import { TabWithStates, LangObj, RegBlocs, tabRegBloc } from "./config";
+import { TabWithStates, LangObj, RegBlocs } from "./config";
 
-export const compareValue = (tableWithData: Array<[string, number | string[] | LangObj | undefined]>) => {
+export const compareValue = (tableWithData: Array<[string, number ]>) => {
     function compare(a:any, b:any): number  {
         if(typeof a[1] === 'number' && typeof b[1] === 'number') {
             if (a[1] > b[1]) {
                 return -1;
             }
+            if (a[1] < b[1]) {
+                return 1;
+            }
+            return 0;
         }
         return 0;
     }
@@ -21,25 +25,25 @@ export const createObjLanguage = (object: any, codeLang: string) => {
     }
 }
 
-export const addDataToObjLanguage = (referenceToObj: any, country: TabWithStates, codeLang: string, nativeNameLang: string, langExist: boolean = false) => {
-    if(referenceToObj != undefined) {
-        if(country.alpha3Code) referenceToObj[codeLang].countries.push(country.alpha3Code);
-        if(country.population) referenceToObj[codeLang].population += country.population;
-        if(country.area) referenceToObj[codeLang].area += country.area;      
+export const addDataToObjLanguage = (objectWithLanguages: any, country: TabWithStates, codeLang: string, nativeNameLang: string, langExist: boolean = false) => {
+    if(objectWithLanguages != undefined) {
+        if(country.alpha3Code) objectWithLanguages[codeLang].countries.push(country.alpha3Code);
+        if(country.population) objectWithLanguages[codeLang].population += country.population;
+        if(country.area) objectWithLanguages[codeLang].area += country.area;      
         if(langExist) {
-            // if(country.nativeName) referenceToObj[codeLang].name += `, ${nativeNameLang}`;
+            // if(country.nativeName) objectWithLanguages[codeLang].name += `, ${nativeNameLang}`;
         } else {
-            if(country.nativeName) referenceToObj[codeLang].name += nativeNameLang;
+            if(country.nativeName) objectWithLanguages[codeLang].name += nativeNameLang;
         }
     }
 }
 
-export const getLanguages = (referencjeToObj:any, stateInRegionalBloc: Array<TabWithStates>, nameBlock?: RegBlocs) => {
+export const getLanguages = (objectWithLanguages:any, stateInRegionalBloc: Array<TabWithStates>, nameBlock?: RegBlocs) => {
     let languagesObj: LangObj | undefined = {};
     if(nameBlock != undefined) {
-        languagesObj = referencjeToObj[nameBlock].languages;
+        languagesObj = objectWithLanguages[nameBlock].languages;
     } else {
-        languagesObj = referencjeToObj
+        languagesObj = objectWithLanguages
     }
 
     stateInRegionalBloc.forEach(singleState => {

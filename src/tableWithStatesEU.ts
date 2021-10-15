@@ -29,6 +29,10 @@ export class TableWithStatesEU {
                 if (a[keyBySort] > b[keyBySort]) {
                     return -1;
                 }
+                if (a[keyBySort] < b[keyBySort]) {
+                    return 1;
+                }
+                return 0;
             }
             return 0;
         }
@@ -52,11 +56,9 @@ export class TableWithStatesEU {
         const nameTopStates: string[] = onlyTopStates.map(el => el.name);
         const sumOfPopulation: number = onlyTopStates.reduce( (a,b) => a + b.population, 0)
 
-        if(sumOfPopulation > 500000000) {
-            return console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates + logsTexts.tableWithStatesEU.countEUPopulation.moreThan + sumOfPopulation.toString() + logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates + nameTopStates.join(', '));
-        } else {
-            return console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates + logsTexts.tableWithStatesEU.countEUPopulation.lessThan + sumOfPopulation.toString() + logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates + nameTopStates.join(', '));
-        }
+        const lessOrMore = (sumOfPopulation > 500000000) ? logsTexts.tableWithStatesEU.countEUPopulation.moreThan : logsTexts.tableWithStatesEU.countEUPopulation.lessThan
+        
+        console.log(logsTexts.tableWithStatesEU.countEUPopulation.prelude + amountStates + lessOrMore + sumOfPopulation.toString() + logsTexts.tableWithStatesEU.countEUPopulation.infoAboutStates + nameTopStates.join(', '));
     }
 }
 
