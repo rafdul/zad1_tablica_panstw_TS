@@ -1,4 +1,5 @@
-import { TabWithStates, logsTexts } from './config'
+import { logsTexts } from './config';
+import { TabWithStates } from './types';
 
 export class StorageBrowser {
     getStorage(key: string): any {

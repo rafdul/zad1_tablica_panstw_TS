@@ -36,10 +36,11 @@ describe(`Different scenarios of app's init:`, () => {
     test('- simulate start with using local storage (there are states in local storage and these data are quite new)', () => {
         newStorage.saveStorage('states', mockValues.states2);
         newStorage.saveStorage('date', ((new Date).getTime() - 10*1000));
-        // console.log('flaga ze stora',newTableWithStatesFromAPI.downloadFromApiAgain(newStorage.getStorage('date')), ' długość tablicy w store ', newStorage.getStorage('states').length)
+        console.log('flaga ze stora',newTableWithStatesFromAPI.downloadFromApiAgain(newStorage.getStorage('date')), ' długość tablicy w store ', newStorage.getStorage('states').length)
         
-        newTableWithStatesFromAPI.downloadFromAPI = jest.fn()
-        newTableWithStatesFromAPI.selectStatesByBlock = jest.fn()
+        newTableWithStatesFromAPI.downloadFromAPI = jest.fn();
+        newTableWithStatesFromAPI.selectStatesByBlock = jest.fn();
+        newTableWithStatesFromAPI.createRegionalBlocs = jest.fn();
 
         newTableWithStatesFromAPI.init();
 

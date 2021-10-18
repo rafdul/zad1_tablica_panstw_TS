@@ -181,14 +181,15 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     const blockLastAmountLanguages = showInfoAboutOrder(someData, 'languages');
 
     console.log(`Blok:
-    - pierwszy pod wzgl. populacji: ${blockFirstPopulation},
-    - drugi pod wzgl. gęstości: ${blockSecondDensity},
-    - trzeci pod wzgl. obszaru: ${blockThirdArea},
-    - ostatni pod wzgl. liczby krajów: ${blockLastCountries},
-    - pierwszy pod wzgl. liczby walut: ${blockFirstCurrencies},
-    - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages[0]},
-    - ostatni pod względem liczby języków: ${blockLastAmountLanguages[blockLastAmountLanguages.length-1][0]}
-    `)
+        - pierwszy pod wzgl. populacji: ${blockFirstPopulation},
+        - drugi pod wzgl. gęstości: ${blockSecondDensity},
+        - trzeci pod wzgl. obszaru: ${blockThirdArea},
+        - ostatni pod wzgl. liczby krajów: ${blockLastCountries},
+        - pierwszy pod wzgl. liczby walut: ${blockFirstCurrencies},
+        - pierwszy pod wzgl. liczby języków: ${blockFirstAmountLanguages[0]},
+        - ostatni pod względem liczby języków: ${blockLastAmountLanguages[blockLastAmountLanguages.length-1][0]}
+        `
+    )
 }
 
 export const getInfoLanguages = (data: Array<TabWithStates>) => {
