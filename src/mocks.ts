@@ -1,4 +1,6 @@
-import { MS_IN_6DAYS, TabWithStates } from './config'
+import { MS_IN_6DAYS } from './config'
+import { TabWithStates } from './types';
+
 
 const timeNow: number = (new Date).getTime();
 

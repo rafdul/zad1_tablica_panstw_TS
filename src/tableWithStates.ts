@@ -1,4 +1,5 @@
-import { TabWithStates, logsTexts, MS_IN_6DAYS, apiUrl } from './config'
+import { logsTexts, MS_IN_6DAYS, apiUrl } from './config'
+import { TabWithStates } from './types';
 import { tableWithStatesEU } from './tableWithStatesEU';
 import { storage } from './storage';
 import { makeRegionalBlocs, getInfoRegBloc, getInfoLanguages } from './tableRegionalBloc';

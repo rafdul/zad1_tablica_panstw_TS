@@ -2,7 +2,7 @@ import { TableWithStates } from './tableWithStates';
 import { StorageBrowser } from './storage';
 import { TableWithStatesEU } from './tableWithStatesEU';
 import { mockValues } from './mocks'
-import { TabWithStates, logsTexts } from './config';
+import { logsTexts } from './config';
 
 let newTableWithStatesFromAPI: any = null;
 let newStorage: any = null;

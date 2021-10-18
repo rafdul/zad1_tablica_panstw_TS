@@ -1,4 +1,6 @@
-import { TabWithStates, logsTexts } from './config'
+import { logsTexts } from './config';
+import { TabWithStates } from './types';
+import { compareValue } from './utilsFunctions';
 
 export class TableWithStatesEU {
     states: Array<TabWithStates> = [];
@@ -17,28 +19,11 @@ export class TableWithStatesEU {
             }
         });
 
-        this.compareStates(tableStates, 'density')
+        compareValue(tableStates, 'density')
+        console.log(logsTexts.tableWithStatesEU.addDensity.showTable, tableStates);
+
         this.removeLetterFromName(tableStates, 'a');
         this.countEUPopulation(tableStates, 5);
-    }
-
-    // sortowanie państw wg jakiegoś kryterium (keyBySort)
-    compareStates(tableWithStates:Array<TabWithStates>, keyBySort:string): void {
-        function compare(a:any, b:any): number  {
-            if(typeof a[keyBySort] === 'number' && typeof b[keyBySort] === 'number') {
-                if (a[keyBySort] > b[keyBySort]) {
-                    return -1;
-                }
-                if (a[keyBySort] < b[keyBySort]) {
-                    return 1;
-                }
-                return 0;
-            }
-            return 0;
-        }
-
-        tableWithStates.sort(compare)
-        console.log(logsTexts.tableWithStatesEU.compareStates.showTable, tableWithStates)
     }
 
     // usunąć państwa posiadające literę A lub a

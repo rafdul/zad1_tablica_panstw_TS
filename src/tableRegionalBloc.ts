@@ -1,4 +1,4 @@
-import { TabWithStates, tabRegBloc, RegBlocs, LangObj } from './config'
+import { TabWithStates, tabRegBloc, RegBlocs, LangObj } from './types'
 import { compareValue, getLanguages } from './utilsFunctions';
 
 export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
@@ -29,7 +29,7 @@ export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
                 if(el.regionalBlocs.find(i => i.acronym === 'NAFTA')) {
                     naftaBlock.push(el);
                 } 
-                if(el.regionalBlocs.find(i => (i.acronym != 'EU' && i.acronym != 'AU' && i.acronym != 'NAFTA' ))) {
+                if(el.regionalBlocs.find(i => (i.acronym !== 'EU' && i.acronym !== 'AU' && i.acronym !== 'NAFTA' ))) {
                     otherBlock.push(el);
                 }
             } else {
@@ -43,10 +43,10 @@ export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
         stateInRegionalBloc.forEach(el => {
             if(el.nativeName != undefined && nameBlock != undefined) {
                 regionalBlocs[nameBlock].countries.push(el.nativeName);
-                regionalBlocs[nameBlock].countries.sort().reverse();
             } else {
                 console.log('W tablicy są państwa, które nie mają nativeName.');
             }
+            regionalBlocs[nameBlock].countries.sort().reverse();
         })
     }
 
@@ -64,19 +64,13 @@ export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
         });
     }
 
-    // dodawanie populacji państw w ramach bloków
-    const getSumPopulation = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
-        stateInRegionalBloc.forEach(el => {
-            if(el.population !== undefined && nameBlock !== undefined)
-                regionalBlocs[nameBlock].population += el.population;                
-        });
-    }
-
-    // dodawanie powierzchni państw w ramach bloków
-    const getSumArea = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs) => {
-        stateInRegionalBloc.forEach(el => {
-            if(typeof el.area === 'number' && nameBlock != undefined)
-                regionalBlocs[nameBlock].area += el.area;                
+    // dodawanie populacji i powierzchni państw w ramach bloków
+    const getSum = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs, keyWord: 'area' | 'population') => {
+        stateInRegionalBloc.forEach((el:TabWithStates) => {
+            if(nameBlock !== undefined) {
+                let diff = el[keyWord]
+                regionalBlocs[nameBlock][keyWord] += (typeof diff !== 'undefined') ? diff : 0 ;   
+            } 
         });
     }
 
@@ -98,8 +92,8 @@ export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
         parametersRegBlocs.forEach( item => {
             getNativeName(item[0], item[1]);
             getCurrencies(item[0], item[1]);
-            getSumPopulation(item[0], item[1]);
-            getSumArea(item[0], item[1]);
+            getSum(item[0], item[1], 'population')
+            getSum(item[0], item[1], 'area');
             getLanguages(regionalBlocs, item[0], item[1]);
         });
     }
@@ -155,7 +149,7 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
             });
         }
       
-        compareValue(arrCheckedValue);
+        compareValue(arrCheckedValue, 1);
         // console.log(`tablica [blok, ${keyWord}]`, arrCheckedValue);
 
         if(typeof indexInTable === 'number' && indexInTable >= 0) {
@@ -220,7 +214,7 @@ export const getInfoLanguages = (data: Array<TabWithStates>) => {
             });
         }
         
-        compareValue(arrCheckedValue)
+        compareValue(arrCheckedValue, 1)
         // console.log('1 arrCheckedValue po sortowaniu', arrCheckedValue);
 
         return arrCheckedValue

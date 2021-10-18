@@ -1,64 +1,57 @@
-// export const MS_IN_6DAYS: number = 6*24*60*60*1000;
-export const MS_IN_6DAYS: number = 30*1000; // wartość do testów
+export const MS_IN_6DAYS: number = 6*24*60*60*1000;
+// export const MS_IN_6DAYS: number = 30*1000; // wartość do testów
 export const apiUrl: string = 'https://restcountries.com/v2/all';
+import { Texts } from './types';
 
 
-interface Texts {
-    [key: string]: {
-        [key: string]: {
-            [key: string]: string,
-        }
-    }
-}
-
-export interface LangObj {
-    [key: string]: {
-        countries: Array<string>,
-        population: number,
-        area: number,
-        name: string,
-    },
-}
-
-export interface TabWithStates {
-    name: string,
-    population: number,
-    area?: number,
-    density?: number,
-    id?: number,
-    alpha3Code?: string,
-    regionalBlocs?: Array<{acronym: string}>,
-    nativeName?: string,
-    currencies?: Array<{code: string, name: string, symbol: string}>,
-    languages?: Array<{iso639_1: string, iso639_2: string, name: string, nativeName: string}>,
-};
-
-export interface RegBlocInfo {
-    countries: Array<string>,
-    population: number,
-    // languages?: {
-    //     [key: string]: {
-    //         countries: Array<string>,
-    //         population: number,
-    //         area: number,
-    //         name: string,
-    //     },
-    // }
-    languages?: LangObj,
-    currencies: Array<string>,
-    area: number,
-    density: number,
-};
-
-// export interface tabRegBloc {
-//     EU: RegBlocInfo,
-//     NAFTA: RegBlocInfo,
-//     AU: RegBlocInfo,
-//     other: RegBlocInfo,
+// interface Texts {
+//     [key: string]: {
+//         [key: string]: {
+//             [key: string]: string,
+//         }
+//     }
 // }
 
-export type RegBlocs = 'EU' | 'NAFTA' | 'AU' | 'other';
-export type tabRegBloc = Record<RegBlocs, RegBlocInfo>;
+// export interface LangObj {
+//     [key: string]: {
+//         countries: Array<string>,
+//         population: number,
+//         area: number,
+//         name: string,
+//     },
+// }
+
+// export interface TabWithStates {
+//     name: string,
+//     population: number,
+//     area?: number,
+//     density?: number,
+//     id?: number,
+//     alpha3Code?: string,
+//     regionalBlocs?: Array<{acronym: string}>,
+//     nativeName?: string,
+//     currencies?: Array<{code: string, name: string, symbol: string}>,
+//     languages?: Array<{iso639_1: string, iso639_2: string, name: string, nativeName: string}>,
+// };
+
+// export interface RegBlocInfo {
+//     countries: Array<string>,
+//     population: number,
+//     languages?: LangObj,
+//     currencies: Array<string>,
+//     area: number,
+//     density: number,
+// };
+
+// // export interface tabRegBloc {
+// //     EU: RegBlocInfo,
+// //     NAFTA: RegBlocInfo,
+// //     AU: RegBlocInfo,
+// //     other: RegBlocInfo,
+// // }
+
+// export type RegBlocs = 'EU' | 'NAFTA' | 'AU' | 'other';
+// export type tabRegBloc = Record<RegBlocs, RegBlocInfo>;
 
 // zmienna zawierająca bibliotekę komunikatów w konsoli
 export var logsTexts: Texts = {
@@ -96,7 +89,7 @@ export var logsTexts: Texts = {
         },
     },
     tableWithStatesEU: {
-        compareStates: {
+        addDensity: {
             showTable: 'Państwa UE posortowane wg gęstości',
         },
         removeLetterA: {

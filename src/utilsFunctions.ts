@@ -1,12 +1,12 @@
-import { TabWithStates, LangObj, RegBlocs } from "./config";
+import { TabWithStates, LangObj, RegBlocs } from "./types";
 
-export const compareValue = (tableWithData: Array<[string, number ]>) => {
+export const compareValue = (tableWithData: Array<[string, number ] | TabWithStates>, keyBySort: number | string) => {
     function compare(a:any, b:any): number  {
-        if(typeof a[1] === 'number' && typeof b[1] === 'number') {
-            if (a[1] > b[1]) {
+        if(typeof a[keyBySort] === 'number' && typeof b[keyBySort] === 'number') {
+            if (a[keyBySort] > b[keyBySort]) {
                 return -1;
             }
-            if (a[1] < b[1]) {
+            if (a[keyBySort] < b[keyBySort]) {
                 return 1;
             }
             return 0;
@@ -30,9 +30,7 @@ export const addDataToObjLanguage = (objectWithLanguages: any, country: TabWithS
         if(country.alpha3Code) objectWithLanguages[codeLang].countries.push(country.alpha3Code);
         if(country.population) objectWithLanguages[codeLang].population += country.population;
         if(country.area) objectWithLanguages[codeLang].area += country.area;      
-        if(langExist) {
-            // if(country.nativeName) objectWithLanguages[codeLang].name += `, ${nativeNameLang}`;
-        } else {
+        if(langExist === false) {
             if(country.nativeName) objectWithLanguages[codeLang].name += nativeNameLang;
         }
     }
@@ -40,19 +38,19 @@ export const addDataToObjLanguage = (objectWithLanguages: any, country: TabWithS
 
 export const getLanguages = (objectWithLanguages:any, stateInRegionalBloc: Array<TabWithStates>, nameBlock?: RegBlocs) => {
     let languagesObj: LangObj | undefined = {};
-    if(nameBlock != undefined) {
+    if(nameBlock !== undefined) {
         languagesObj = objectWithLanguages[nameBlock].languages;
     } else {
         languagesObj = objectWithLanguages
     }
 
     stateInRegionalBloc.forEach(singleState => {
-        if(Array.isArray(singleState.languages) && languagesObj != undefined) {
+        if( Array.isArray(singleState.languages) ) {
             singleState.languages.forEach(singleLanguage => {
 
-                if(languagesObj != undefined && languagesObj[singleLanguage.iso639_1]) {
+                if(languagesObj !== undefined && languagesObj[singleLanguage.iso639_1]) {
                     addDataToObjLanguage(languagesObj, singleState, singleLanguage.iso639_1, singleLanguage.nativeName, true)
-                } else if (languagesObj != undefined) {
+                } else if (languagesObj !== undefined) {
                     createObjLanguage(languagesObj, singleLanguage.iso639_1);
                     addDataToObjLanguage(languagesObj, singleState, singleLanguage.iso639_1, singleLanguage.nativeName)
                 }
