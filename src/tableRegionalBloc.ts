@@ -65,11 +65,10 @@ export const makeRegionalBlocs = (dataFromApi: Array<TabWithStates>) => {
     }
 
     // dodawanie populacji i powierzchni państw w ramach bloków
-    const getSum = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs, keyWord: 'area' | 'population') => {
+    const getSum = (stateInRegionalBloc: Array<TabWithStates>, nameBlock: RegBlocs, keyword: 'area' | 'population') => {
         stateInRegionalBloc.forEach((el:TabWithStates) => {
             if(nameBlock !== undefined) {
-                let diff = el[keyWord]
-                regionalBlocs[nameBlock][keyWord] += (typeof diff !== 'undefined') ? diff : 0 ;   
+                regionalBlocs[nameBlock][keyword] += el[keyword] || 0;   
             } 
         });
     }
@@ -120,27 +119,29 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
     // console.log('Object.values(ob)', Object.values(someData))
     // console.log('Object.entries(ob)', Object.entries(someData))
     
-    type numberKeyWord = 'population' | 'area' | 'density';
-    type arrayKeyWord = 'countries' | 'currencies';
+    type numberkeyword = 'population' | 'area' | 'density';
+    type arraykeyword = 'countries' | 'currencies';
 
     // funkcje obliczające kolejność bloków pod wzgl różnych kryteriów (m.in. populacji, obszaru, gęstości...)
-    const showInfoAboutOrder = (data: tabRegBloc, keyWord: numberKeyWord | arrayKeyWord | 'languages', indexInTable?: number) => {
+    const showInfoAboutOrder = (data: tabRegBloc, keyword: numberkeyword | arraykeyword | 'languages', indexInTable?: number) => {
         const arrKeyValue= Object.entries(data);
         const arrCheckedValue: Array<[string, number ]> = [];
         
-        if( keyWord === 'population' || keyWord === 'area' || keyWord === 'density' ) {
+        if( ['population', 'area', 'density'].includes(keyword) ) {
             arrKeyValue.forEach( item => {
-                if(item[1][keyWord] ) arrCheckedValue.push([item[0], item[1][keyWord] ])
+                let newValue = item[1][keyword];
+                if(typeof newValue === 'number') arrCheckedValue.push([item[0], newValue]);
             });
         }
 
-        if( keyWord === 'countries' || keyWord === 'currencies') {
+        if( ['countries', 'currencies'].includes(keyword) ) {
             arrKeyValue.forEach( item => {
-                arrCheckedValue.push([item[0], item[1][keyWord].length ])
+                let newValue = item[1][keyword];
+                if(Array.isArray(newValue)) arrCheckedValue.push([item[0], newValue.length ])
             });
         }
 
-        if(keyWord === 'languages') {
+        if(keyword === 'languages') {
             arrKeyValue.forEach( item => {
                 if(typeof item[1].languages !== 'undefined') {
                     let amountOfLang = Object.keys(item[1].languages);
@@ -150,7 +151,7 @@ export const getInfoRegBloc = (someData:tabRegBloc) => {
         }
       
         compareValue(arrCheckedValue, 1);
-        // console.log(`tablica [blok, ${keyWord}]`, arrCheckedValue);
+        // console.log(`tablica [blok, ${keyword}]`, arrCheckedValue);
 
         if(typeof indexInTable === 'number' && indexInTable >= 0) {
             return arrCheckedValue[indexInTable][0];
@@ -198,20 +199,21 @@ export const getInfoLanguages = (data: Array<TabWithStates>) => {
     const languages: LangObj = {};
 
     // funkcja porównująca języki pod względem liczby krajów, populacji, powierzchni państw
-    const getTheMostPopularLang = (data:LangObj, keyWord: 'countries' | 'population' | 'area') => {
+    const getTheMostPopularLang = (data:LangObj, keyword: 'countries' | 'population' | 'area') => {
         const arrKeyValue = Object.entries(data);
         // console.log('1 arrKeyValue', arrKeyValue);
         const arrCheckedValue: Array<[string, number]> = [];
 
-        if(keyWord === 'countries') {
+        if(keyword === 'countries') {
             arrKeyValue.forEach( item => {
-                arrCheckedValue.push([item[0], item[1][keyWord].length ])
+                arrCheckedValue.push([item[0], item[1][keyword].length ])
             });
         }
-
-        if(keyWord === 'population' || keyWord === 'area') {
+        
+        if( ['population', 'area'].includes(keyword) ) {
             arrKeyValue.forEach( item => {
-                arrCheckedValue.push([item[0], item[1][keyWord] ])
+                let newValue = item[1][keyword]
+                if(typeof newValue === 'number') arrCheckedValue.push([item[0], newValue])
             });
         }
         
